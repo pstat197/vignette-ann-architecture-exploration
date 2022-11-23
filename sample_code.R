@@ -1,10 +1,10 @@
 # Import Required packages
 set.seed(500)
 library(neuralnet)
-library(datasets)
-
+install.packages("AppliedPredictiveModeling")
+library(AppliedPredictiveModeling)
 # Euro stock dataset from MASS
-data <- EuStockMarkets
+data <- (abalone)
 
 # Normalize the data
 maxs <- apply(data, 2, max) 
