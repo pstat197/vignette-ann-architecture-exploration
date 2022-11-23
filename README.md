@@ -1,1 +1,1 @@
-# vignette-ann-architecture-exploration
+# Vignette on implementing Neural Network using EU Stock data; created as a class project for PSTAT197A in Fall 2022.
