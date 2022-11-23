@@ -1,6 +1,6 @@
 ### Description:
 
-Vignette on implementing Neural Network using EU Stock data; created as a class project for PSTAT197A in Fall 2022.
+Vignette on implementing Neural Network using abalone data; created as a class project for PSTAT197A in Fall 2022.
 
 ### Contributors:
 
