@@ -1,21 +1,26 @@
 # Import Required packages
 set.seed(500)
+#install.packages("AppliedPredictiveModeling")
 library(neuralnet)
-install.packages("AppliedPredictiveModeling")
+library(tidyverse)
+library(tidymodels)
+library(keras)
+library(tensorflow)
 library(AppliedPredictiveModeling)
-# Euro stock dataset from MASS
-data <- (abalone)
+# abalone dataset
+data(abalone)
 
 # Normalize the data
-maxs <- apply(data, 2, max) 
-mins <- apply(data, 2, min)
-scaled <- as.data.frame(scale(data, center = mins, 
+maxs <- apply(abalone[2:8], 2, max) 
+mins <- apply(abalone[2:8], 2, min)
+scaled <- as.data.frame(scale(abalone[2:8], center = mins, 
                               scale = maxs - mins))
 
 # Split the data into training and testing set
-index <- sample(1:nrow(data), round(0.75 * nrow(data)))
-train_ <- scaled[index,]
-test_ <- scaled[-index,]
+set.seed(102722)
+partitions <- scaled %>% initial_split(prop = 0.8)
+test_ <- testing(partitions)
+train_ <- training(partitions)
 
 # Build Neural Network
 nn <- neuralnet(medv ~ crim + zn + indus + chas + nox 
