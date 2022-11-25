@@ -1,11 +1,11 @@
 # Import Required packages
-set.seed(500)
 #install.packages("AppliedPredictiveModeling")
 library(neuralnet)
 library(tidyverse)
 library(tidymodels)
 library(keras)
 library(tensorflow)
+library(MASS)
 library(AppliedPredictiveModeling)
 # abalone dataset
 data(abalone)
@@ -15,22 +15,27 @@ maxs <- apply(abalone[2:8], 2, max)
 mins <- apply(abalone[2:8], 2, min)
 scaled <- as.data.frame(scale(abalone[2:8], center = mins, 
                               scale = maxs - mins))
+abalone['age'] <- abalone['Rings'] + 1.5
+age <- abalone['age']
 
 # Split the data into training and testing set
-set.seed(102722)
+set.seed(12312001)
 partitions <- scaled %>% initial_split(prop = 0.8)
+partitions2 <- age %>% initial_split(prop = 0.8)
 test_ <- testing(partitions)
 train_ <- training(partitions)
-
+train_age <- training(partitions2)
+test_age <- testing(partitions2)
+train2 <- cbind(train_, train_age)
+test2 <- cbind(test_, test_age)
 # Build Neural Network
-nn <- neuralnet(medv ~ crim + zn + indus + chas + nox 
-                + rm + age + dis + rad + tax + 
-                  ptratio + black + lstat, 
-                data = train_, hidden = c(5, 3), 
+nn <- neuralnet(age ~ LongestShell + Diameter + 
+                  Height + WholeWeight + ShuckedWeight + VisceraWeight + 
+                  ShellWeight, data = train2, hidden = c(5, 3), 
                 linear.output = TRUE)
 
 # Predict on test data
-pr.nn <- compute(nn, test_[,1:13])
+pr.nn <- neuralnet::compute(nn, test_)
 
 # Compute mean squared error
 pr.nn_ <- pr.nn$net.result * (max(data$medv) - min(data$medv)) 
