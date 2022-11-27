@@ -3,9 +3,6 @@
 library(neuralnet)
 library(tidyverse)
 library(tidymodels)
-library(keras)
-library(tensorflow)
-library(MASS)
 library(AppliedPredictiveModeling)
 # abalone dataset
 data(abalone)
