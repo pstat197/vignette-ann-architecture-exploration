@@ -29,10 +29,12 @@ test2 <- cbind(test_, test_age)
 nn <- neuralnet(age ~ LongestShell + Diameter + 
                   Height + WholeWeight + ShuckedWeight + VisceraWeight + 
                   ShellWeight, data = train2, hidden = c(2, 2), 
-                linear.output = TRUE, stepmax = 50000, learningrate = 500)
+                linear.output = TRUE, stepmax = 500000, learningrate = 500)
+write_rds(nn, file = "neural_net_take_1.rds")
+nn1 <- read_rds(file = "neural_net_take_1.rds")
 
 # Predict on test data
-pr.nn <- neuralnet::compute(nn, test2)
+pr.nn <- neuralnet::compute(nn1, test2)
 
 # Compute mean squared error
 pr.nn_ <- pr.nn$net.result * (max(age) - min(age)) 

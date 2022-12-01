@@ -39,7 +39,7 @@ model %>%
 history <- model %>%
   fit(x = x_train, 
       y = y_train,
-      epochs = 10,
+      epochs = 100,
       validation_split = 0.3)
 
 summary(model)
