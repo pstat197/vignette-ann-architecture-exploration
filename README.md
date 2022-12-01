@@ -14,7 +14,17 @@ For our PSTAT 197A Final vignette, we wanted to take a deep dive into Artificial
 
 Our example data is the abalone dataset built into R, containing data on 4177 abalones. The dataset include variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights.
 
-Our outcomes of our exploration were as follows:
+Our outcomes of our exploration were as follows (note how changes of each of these affect the outcome of the model):
+
+Layers:
+
+Epochs:
+
+Validation Split:
+
+Activation Function:
+
+Error Metric:
 
 ### Repository Contents:
 
