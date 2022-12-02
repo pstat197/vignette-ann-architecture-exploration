@@ -4,6 +4,7 @@ library(neuralnet)
 library(tidyverse)
 library(tidymodels)
 library(AppliedPredictiveModeling)
+library(cobalt)
 # abalone dataset
 data(abalone)
 abalone['age'] <- abalone['Rings'] + 1.5
@@ -67,6 +68,7 @@ test_all <- testing(partitions_all)
 train_all <- training(partitions_all)
 
 #build one hidden node with 3 split type
+###website example
 nmodel_1 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
                         Diameter + Height + WholeWeight + ShuckedWeight + 
                         VisceraWeight + ShellWeight, data = train_all, 
@@ -74,17 +76,119 @@ nmodel_1 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell +
                       learningrate.limit = NULL, 
                       learningrate.factor = list(minus = 0.5, plus = 1.2),
                       algorithm = "rprop+")
-
+###sammy example
 nmodel_1b <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
                          Diameter + Height + WholeWeight + ShuckedWeight + 
                          VisceraWeight + ShellWeight, data = train_all, 
                        hidden = 1, linear.output = TRUE, stepmax = 500000, 
                        learningrate = 500)
+write_rds(nmodel_1, file = "single_nn_1.rds")
+single_nn1 <- read_rds(file = "single_nn_1.rds")
+
+write_rds(nmodel_1b, file = "single_nn_2.rds")
+single_nn2 <- read_rds(file = "single_nn_2.rds")
+
+#predict on test data
+pr.nn1 <- neuralnet::compute(single_nn1, test_all)
+pr.nn2 <- neuralnet::compute(single_nn2, test_all)
+
+#compute mean square error
+pr_nn1 <- pr.nn1$net.result * (max(age) - min(age))
++ min(age)
+test_r1 <- (test_all$age) * (max(test_all$age) - 
+                              min(test_all$age)) + 
+  min(test_all$age)
+mse_nn1 <- sum((test_r1 - pr_nn1)^2) / nrow(test_all)
+#79.00748
+
+pr_nn2 <- pr.nn2$net.result * (max(age) - min(age))
++ min(age)
+test_r2 <- (test_all$age) * (max(test_all$age) - 
+                               min(test_all$age)) + 
+  min(test_all$age)
+mse_nn2 <- sum((test_r2 - pr_nn2)^2) / nrow(test_all)
+#79.04422
 
 #plot
 plot(nmodel_1) #10.119157 error, 4729? steps
 
 plot(nmodel_1b) #10.12522 error, 69883 steps
+
+#plot regression line
+plot(test_all$age, pr_nn1, col = "red", 
+     main = "Real vs. Predicted for Single node")
+lm(pr_nn1 ~ test_all$age)
+#intercept: 3.972, slope: 15.571
+abline(3.972, 15.571)
+
+plot(test_all$age, pr_nn2, col = "red", 
+     main = "Real vs. Predicted for Single node pt.2")
+lm(pr_nn2 ~ test_all$age)
+#intercept: 3.966, slope: 15.587
+abline(3.966, 15.587)
+
+#multiple hidden nodes
+set.seed(1234)
+#website example
+nn_multi1 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                        Diameter + Height + WholeWeight + ShuckedWeight + 
+                        VisceraWeight + ShellWeight, data = train_all,
+                       algorithm = "rprop+",
+                      hidden = c(2,2), threshold = 0.01, 
+                      stepmax = 500000)
+#sammy example
+nn_multi2 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                        Diameter + Height + WholeWeight + ShuckedWeight + 
+                        VisceraWeight + ShellWeight, data = train_all,
+                      hidden = c(2,2), linear.output = TRUE, stepmax = 500000, 
+                      learningrate = 500)
+write_rds(nn_multi1, file = "multi_nn_1.rds")
+multi_nn1 <- read_rds(file = "multi_nn_1.rds")
+
+write_rds(nn_multi2, file = "multi_nn_2.rds")
+multi_nn2 <- read_rds(file = "multi_nn_2.rds")
+
+###fix code below
+#predict on test data
+pr.nn1 <- neuralnet::compute(single_nn1, test_all)
+pr.nn2 <- neuralnet::compute(single_nn2, test_all)
+
+#compute mean square error
+pr_nn1 <- pr.nn1$net.result * (max(age) - min(age))
++ min(age)
+test_r1 <- (test_all$age) * (max(test_all$age) - 
+                               min(test_all$age)) + 
+  min(test_all$age)
+mse_nn1 <- sum((test_r1 - pr_nn1)^2) / nrow(test_all)
+#79.00748
+
+pr_nn2 <- pr.nn2$net.result * (max(age) - min(age))
++ min(age)
+test_r2 <- (test_all$age) * (max(test_all$age) - 
+                               min(test_all$age)) + 
+  min(test_all$age)
+mse_nn2 <- sum((test_r2 - pr_nn2)^2) / nrow(test_all)
+#79.04422
+
+#plot
+plot(nmodel_1) #10.119157 error, 4729? steps
+
+plot(nmodel_1b) #10.12522 error, 69883 steps
+
+#plot regression line
+plot(test_all$age, pr_nn1, col = "red", 
+     main = "Real vs. Predicted for Single node")
+lm(pr_nn1 ~ test_all$age)
+#intercept: 3.972, slope: 15.571
+abline(3.972, 15.571)
+
+plot(test_all$age, pr_nn2, col = "red", 
+     main = "Real vs. Predicted for Single node pt.2")
+lm(pr_nn2 ~ test_all$age)
+#intercept: 3.966, slope: 15.587
+abline(3.966, 15.587)
+
+####testing code below
 
 #one hidden node
 library(neuralnet)
@@ -94,6 +198,8 @@ nmodel1 <- neuralnet(f, data = abalone_matrix, hidden = 1,
                     learningrate.limit = NULL, 
                     learningrate.factor = list(minus = 0.5, plus = 1.2),
                     algorithm = "rprop+")
+
+
 
 # Predict on test data
 pr.nn2 <- neuralnet::compute(nmodel, abalone_matrix)
