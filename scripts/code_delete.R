@@ -47,10 +47,44 @@ abalone_matrix <- model.matrix(~Type+LongestShell+Diameter+Height+
                                  VisceraWeight+ShellWeight+age, 
                                data = abalone_mine)
 colnames(abalone_matrix)
+
 col_list <- paste(c(colnames(abalone_matrix[, -
                                               c(1, 11)])), collapse = "+")
 col_list <- paste(c("age~", col_list), collapse="")
 f <- formula(col_list)
+
+#another way: factor variables to dummy variables: Type
+to_split <- list(letters[1:ncol(abalone_mine)], 
+                 1:ncol(abalone_mine))
+abalone_dumm <- splitfactor(abalone_mine, split.with = to_split, 
+                            drop.first = FALSE)
+abalone_dumm
+
+#split to training and testing
+set.seed(1234)
+partitions_all <- abalone_dumm %>% initial_split(prop = 0.8)
+test_all <- testing(partitions_all)
+train_all <- training(partitions_all)
+
+#build one hidden node with 3 split type
+nmodel_1 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                        Diameter + Height + WholeWeight + ShuckedWeight + 
+                        VisceraWeight + ShellWeight, data = train_all, 
+                      hidden = 1, threshold = 0.01, 
+                      learningrate.limit = NULL, 
+                      learningrate.factor = list(minus = 0.5, plus = 1.2),
+                      algorithm = "rprop+")
+
+nmodel_1b <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                         Diameter + Height + WholeWeight + ShuckedWeight + 
+                         VisceraWeight + ShellWeight, data = train_all, 
+                       hidden = 1, linear.output = TRUE, stepmax = 500000, 
+                       learningrate = 500)
+
+#plot
+plot(nmodel_1) #10.119157 error, 4729? steps
+
+plot(nmodel_1b) #10.12522 error, 69883 steps
 
 #one hidden node
 library(neuralnet)
