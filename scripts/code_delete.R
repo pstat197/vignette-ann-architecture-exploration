@@ -110,9 +110,9 @@ mse_nn2 <- sum((test_r2 - pr_nn2)^2) / nrow(test_all)
 #79.04422
 
 #plot
-plot(nmodel_1) #10.119157 error, 4729? steps
+plot(single_nn1) #10.119157 error, 4729? steps
 
-plot(nmodel_1b) #10.12522 error, 69883 steps
+plot(single_nn2) #10.12522 error, 69883 steps
 
 #plot regression line
 plot(test_all$age, pr_nn1, col = "red", 
@@ -150,37 +150,44 @@ multi_nn2 <- read_rds(file = "multi_nn_2.rds")
 
 ###fix code below
 #predict on test data
-pr.nn1 <- neuralnet::compute(single_nn1, test_all)
-pr.nn2 <- neuralnet::compute(single_nn2, test_all)
+pr.nn3 <- neuralnet::compute(multi_nn1, test_all)
+pr.nn4 <- neuralnet::compute(multi_nn2, test_all)
 
 #compute mean square error
-pr_nn1 <- pr.nn1$net.result * (max(age) - min(age))
+pr_nn3 <- pr.nn3$net.result * (max(age) - min(age))
 + min(age)
-test_r1 <- (test_all$age) * (max(test_all$age) - 
+test_r3 <- (test_all$age) * (max(test_all$age) - 
                                min(test_all$age)) + 
   min(test_all$age)
-mse_nn1 <- sum((test_r1 - pr_nn1)^2) / nrow(test_all)
-#79.00748
+mse_nn3 <- sum((test_r3 - pr_nn3)^2) / nrow(test_all)
+#79.50398
 
-pr_nn2 <- pr.nn2$net.result * (max(age) - min(age))
+pr_nn4 <- pr.nn4$net.result * (max(age) - min(age))
 + min(age)
-test_r2 <- (test_all$age) * (max(test_all$age) - 
+test_r4 <- (test_all$age) * (max(test_all$age) - 
                                min(test_all$age)) + 
   min(test_all$age)
-mse_nn2 <- sum((test_r2 - pr_nn2)^2) / nrow(test_all)
-#79.04422
+mse_nn4 <- sum((test_r4 - pr_nn4)^2) / nrow(test_all)
+#79.73448
 
 #plot
-plot(nmodel_1) #10.119157 error, 4729? steps
+plot(multi_nn1) #9.031362 error, 12087 steps
 
-plot(nmodel_1b) #10.12522 error, 69883 steps
+plot(multi_nn2) #9.072675 error, 9675 steps
 
 #plot regression line
-plot(test_all$age, pr_nn1, col = "red", 
-     main = "Real vs. Predicted for Single node")
-lm(pr_nn1 ~ test_all$age)
-#intercept: 3.972, slope: 15.571
-abline(3.972, 15.571)
+plot(test_all$age, pr_nn3, col = "red", 
+     main = "Real vs. Predicted for Multi Class")
+lm(pr_nn3 ~ test_all$age)
+#intercept: 17.083, slope: 3.504
+abline(3.502, 17.083)
+
+#fit multi regression
+fit1 <- lm(pr_nn3 ~ test_all$age)
+
+
+#multi line regression
+fit1 <- lm(pr_nn3~test_all$agee)
 
 plot(test_all$age, pr_nn2, col = "red", 
      main = "Real vs. Predicted for Single node pt.2")
