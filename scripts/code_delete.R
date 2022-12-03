@@ -10,6 +10,7 @@ data(abalone)
 abalone['age'] <- abalone['Rings'] + 1.5
 
 #normalize (min and max to each individual variable)
+#long way
 abalone_mine <- abalone #made a copy()
 abalone_mine$LongestShell <- (abalone_mine$LongestShell - 
                                 min(abalone_mine$LongestShell)) / 
@@ -38,23 +39,6 @@ abalone_mine$age <- (abalone_mine$age - min(abalone_mine$age)) /
   (max(abalone_mine$age) - min(abalone_mine$age))
 
 #factor variables to dummy variables: Type
-table(abalone_mine$Type)
-levels(abalone_mine$Type)
-head(model.matrix(~Type, data = abalone_mine))
-abalone_mine$Type <- relevel(abalone_mine$Type, ref = "I")
-head(model.matrix(~Type, data = abalone_mine))
-abalone_matrix <- model.matrix(~Type+LongestShell+Diameter+Height+
-                                 WholeWeight+ShuckedWeight+
-                                 VisceraWeight+ShellWeight+age, 
-                               data = abalone_mine)
-colnames(abalone_matrix)
-
-col_list <- paste(c(colnames(abalone_matrix[, -
-                                              c(1, 11)])), collapse = "+")
-col_list <- paste(c("age~", col_list), collapse="")
-f <- formula(col_list)
-
-#another way: factor variables to dummy variables: Type
 to_split <- list(letters[1:ncol(abalone_mine)], 
                  1:ncol(abalone_mine))
 abalone_dumm <- splitfactor(abalone_mine, split.with = to_split, 
@@ -110,7 +94,7 @@ mse_nn2 <- sum((test_r2 - pr_nn2)^2) / nrow(test_all)
 #79.04422
 
 #plot
-plot(single_nn1) #10.119157 error, 4729? steps
+plot(single_nn1) #10.119157 error, 4729 steps
 
 plot(single_nn2) #10.12522 error, 69883 steps
 
@@ -179,23 +163,32 @@ plot(multi_nn2) #9.072675 error, 9675 steps
 plot(test_all$age, pr_nn3, col = "red", 
      main = "Real vs. Predicted for Multi Class")
 lm(pr_nn3 ~ test_all$age)
-#intercept: 17.083, slope: 3.504
-abline(3.502, 17.083)
+#intercept: 16.962, slope: 3.561
+abline(lm(pr_nn3 ~ test_all$age))
 
-#fit multi regression
-fit1 <- lm(pr_nn3 ~ test_all$age)
+plot(test_all$age, pr_nn4, col = "red", 
+     main = "Real vs. Predicted for Multi Class pt.2")
+lm(pr_nn4 ~ test_all$age)
+#intercept: 3.562, slope: 16.950
+abline(3.652, 16.950)
 
+####testing code below (delete later: DO NOT RUN BELOW)
+#factor variables to dummy variables: Type
+table(abalone_mine$Type)
+levels(abalone_mine$Type)
+head(model.matrix(~Type, data = abalone_mine))
+abalone_mine$Type <- relevel(abalone_mine$Type, ref = "I")
+head(model.matrix(~Type, data = abalone_mine))
+abalone_matrix <- model.matrix(~Type+LongestShell+Diameter+Height+
+                                 WholeWeight+ShuckedWeight+
+                                 VisceraWeight+ShellWeight+age, 
+                               data = abalone_mine)
+colnames(abalone_matrix)
 
-#multi line regression
-fit1 <- lm(pr_nn3~test_all$agee)
-
-plot(test_all$age, pr_nn2, col = "red", 
-     main = "Real vs. Predicted for Single node pt.2")
-lm(pr_nn2 ~ test_all$age)
-#intercept: 3.966, slope: 15.587
-abline(3.966, 15.587)
-
-####testing code below
+col_list <- paste(c(colnames(abalone_matrix[, -
+                                              c(1, 11)])), collapse = "+")
+col_list <- paste(c("age~", col_list), collapse="")
+f <- formula(col_list)
 
 #one hidden node
 library(neuralnet)
