@@ -6,16 +6,16 @@ library(keras)
 library(tensorflow)
 
 
-x_train <- train_ %>%
+x_train <- train_all %>% # train_ 
   ungroup() %>%
   as.matrix()
-y_train <- train_age %>%
+y_train <- train_all$age %>% # train_age
   as.matrix()
 
-x_test <- test_ %>%
+x_test <- test_all %>% # test_
   ungroup() %>%
   as.matrix()
-y_test <- test_age %>%
+y_test <- test_all$age %>% # test_age
   as.matrix()
 
 model <- keras_model_sequential(input_shape = 7)
@@ -50,3 +50,6 @@ get_weights(model)
 
 # evaluate on specified data
 evaluate(model, x_test, y_test)
+
+write_rds(model, file = "nn_100_epochs.rds")
+nn_100_epochs <- read_rds(file = "nn_100_epochs.rds")
