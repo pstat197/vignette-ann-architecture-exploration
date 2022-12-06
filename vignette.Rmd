@@ -1,0 +1,86 @@
+---
+title: "ANN Architecture Exploration"
+author: "Alexis Navarra, Giselle Ramirez, Nealson Setiawan, Sammy Suliman"
+date: '2022-12-05'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+Blah blah blah short intro
+
+# Neural Network Architecture Background
+
+## Layers
+
+An artificial neural network is constructed of three types of layers:
+
+-   Input Layer: where the initial data is taken in
+
+-   Output Layer: where the results are produced for given inputs
+
+-   Hidden Layers: where all of the computation is done, between the input and output layers
+
+The hidden layers are composed of 'activation nodes', each having functions that pre-determine to what extent the node will be 'activated' based on the given weight. The weight is what connects the nodes between the neighboring layers. This weight is thought of as the "impact that that node has on the node from the next layer" (Towards Data Science).
+
+The weights between neural network layers can be quantified as a matrix, which we can call $\theta$. If a network has $a$ units in layer $j$ and $b$ units in layer $(j+1)$, then $\theta_j$ will have dimensions $b*(a+1)$: $$\theta_j = 
+\begin{bmatrix}
+\theta_{1,1} & \theta_{1,2} & \dots & \theta_{1,(a+1)} \\
+\theta_{2,1} & \theta_{2,2} & \dots & \theta_{2,(a+1)} \\
+\vdots & \vdots & \ddots & \vdots \\
+\theta_{b,1} & \theta_{b,2} & \dots & \theta_{b,(a+1)} \\
+\end{bmatrix}
+$$
+
+To compute the activation nodes, say $a^{(L)}_n$ where L is the number of layers with n nodes, for each of the hidden layers, we would multiply an input vector, say $X$, by the weights \$\\theta\$, and then apply the activation function, $g$, to get something like this:
+
+$$
+a^{(L)}_1 = g(\theta_{1,1}x_1 + \theta_{1,2}x_2 + \dots + \theta_{1, (a+1)}x_k) \\
+a^{(L)}_2 = g(\theta_{2,1}x_1 + \theta_{2,2}x_2 + \dots + \theta_{2, (a+1)}x_k) \\
+\vdots \\
+a^{(L)}_n = g(\theta_{b,1}x_1 + \theta_{b,2}x_2 + \dots + \theta_{b, (a+1)}x_k)
+$$
+
+## Activation Functions
+
+Like we noted earlier, the activation function pre-determines whether each node should be 'activated' or not based on the weighted sum value, which we can define as \$z\$. One of the most popular activation function is the Sigmoid function:
+
+$$
+S(x) = \frac{1}{1+e^{-x}} = \frac{e^x}{e^x+1}
+$$
+
+This function is non-linear and allows the nodes to take any values between 0 and 1. In the case of multiple output classes, this results in different activation probabilities for each output class, so you are able to select the output class with the highest probability of activation (Towards Data Science).
+
+The cost function represents the sum of the error, as in the difference between the predicted value and the real value. The cost function for neural networks is given by:
+
+$$
+\text{Cost}(h_{\theta}(x),y)=
+$$
+
+#### DELETE:  
+
+the cost function is given by:
+
+$$
+J(\theta)=\frac{1}{m}\sum^m_{i=1}\text{Cost}(h_{\theta}(x^{(i)}), y^{(i)})
+$$
+
+where $h_{\theta}(x)$ is the hypothesis function, and we want it to satisfy the condition $0 \le h_{\theta}(x) \le 1$, so we will define it as $S(\theta^Tx)$ We can defy (Towards Data Science). To optimize the cost function, we need to minimize $J(\theta)$.
+
+# Architecture Exploration
+
+## Using Artificial Neural Networks for Regression
+
+For our purposes, we thought it best to examine neural network architectures in a regression problem. Artificial Neural Networks are used for regression in order to learn the complex, non-linear relationships that are sometimes present between target and features. They are able to do this due to the presence of the activation functions within each layer (Analytics Vidhya).
+
+We chose to conduct our exploration using the abalone dataset built into R. The dataset contains data on 4177 abalones with feature variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. Our target variable, and what we are trying to predict, is the age of the abalone. The data is supervised, as this target can be calculated by adding 1.5 to the number of rings.
+
+## (What we did and all the things we changed (incorporate code))
+
+# Results and Interpretations
+
+What we can interpret about neural network architecture from the things we did and what we changed.

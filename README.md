@@ -34,6 +34,10 @@ An explanation of the directory structure of the repository.
 
 2 or more references to learn more about your topic.
 
+Code references:
+
+Concept references:
+
 ### Instructions:
 
 A typical README file would also contain instructions on use and instructions on contributing to the repository.
