@@ -30,8 +30,8 @@ nn <- neuralnet(age ~ LongestShell + Diameter +
                   Height + WholeWeight + ShuckedWeight + VisceraWeight + 
                   ShellWeight, data = train2, hidden = c(2, 2), 
                 linear.output = TRUE, stepmax = 500000, learningrate = 500)
-write_rds(nn, file = "neural_net_take_1.rds")
-nn1 <- read_rds(file = "neural_net_take_1.rds")
+write_rds(nn, file = "models/neural_net_take_1.rds")
+nn1 <- read_rds(file = "models/neural_net_take_1.rds")
 
 # Predict on test data
 pr.nn <- neuralnet::compute(nn1, test2)

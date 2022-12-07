@@ -1,10 +1,10 @@
-#giselle code 
-
+#load libraries
 library(neuralnet)
 library(tidyverse)
 library(tidymodels)
 library(AppliedPredictiveModeling)
 library(cobalt)
+
 # abalone dataset
 data(abalone)
 abalone['age'] <- abalone['Rings'] + 1.5
@@ -66,11 +66,11 @@ nmodel_1b <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell +
                          VisceraWeight + ShellWeight, data = train_all, 
                        hidden = 1, linear.output = TRUE, stepmax = 500000, 
                        learningrate = 500)
-write_rds(nmodel_1, file = "single_nn_1.rds")
-single_nn1 <- read_rds(file = "single_nn_1.rds")
+write_rds(nmodel_1, file = "models/single_nn_1.rds")
+single_nn1 <- read_rds(file = "models/single_nn_1.rds")
 
-write_rds(nmodel_1b, file = "single_nn_2.rds")
-single_nn2 <- read_rds(file = "single_nn_2.rds")
+write_rds(nmodel_1b, file = "models/single_nn_2.rds")
+single_nn2 <- read_rds(file = "models/single_nn_2.rds")
 
 #predict on test data
 pr.nn1 <- neuralnet::compute(single_nn1, test_all)
@@ -126,13 +126,12 @@ nn_multi2 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell +
                         VisceraWeight + ShellWeight, data = train_all,
                       hidden = c(2,2), linear.output = TRUE, stepmax = 500000, 
                       learningrate = 500)
-write_rds(nn_multi1, file = "multi_nn_1.rds")
-multi_nn1 <- read_rds(file = "multi_nn_1.rds")
+write_rds(nn_multi1, file = "models/multi_nn_1.rds")
+multi_nn1 <- read_rds(file = "models/multi_nn_1.rds")
 
-write_rds(nn_multi2, file = "multi_nn_2.rds")
-multi_nn2 <- read_rds(file = "multi_nn_2.rds")
+write_rds(nn_multi2, file = "models/multi_nn_2.rds")
+multi_nn2 <- read_rds(file = "models/multi_nn_2.rds")
 
-###fix code below
 #predict on test data
 pr.nn3 <- neuralnet::compute(multi_nn1, test_all)
 pr.nn4 <- neuralnet::compute(multi_nn2, test_all)

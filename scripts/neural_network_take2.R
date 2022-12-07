@@ -51,5 +51,5 @@ get_weights(model)
 # evaluate on specified data
 evaluate(model, x_test, y_test)
 
-write_rds(model, file = "nn_100_epochs.rds")
-nn_100_epochs <- read_rds(file = "nn_100_epochs.rds")
+write_rds(model, file = "models/nn_100_epochs.rds")
+nn_100_epochs <- read_rds(file = "models/nn_100_epochs.rds")
