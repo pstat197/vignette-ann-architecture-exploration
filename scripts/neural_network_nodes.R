@@ -43,7 +43,6 @@ to_split <- list(letters[1:ncol(abalone_mine)],
                  1:ncol(abalone_mine))
 abalone_dumm <- splitfactor(abalone_mine, split.with = to_split, 
                             drop.first = FALSE)
-abalone_dumm
 
 #split to training and testing
 set.seed(1234)
@@ -77,13 +76,13 @@ pr.nn1 <- neuralnet::compute(single_nn1, test_all)
 pr.nn2 <- neuralnet::compute(single_nn2, test_all)
 
 #compute mean square error
-pr_nn1 <- pr.nn1$net.result * (max(age) - min(age))
-+ min(age)
-test_r1 <- (test_all$age) * (max(test_all$age) - 
-                              min(test_all$age)) + 
-  min(test_all$age)
+pr_nn1 <- pr.nn1$net.result * (max(abalone$age) - min(abalone$age))
++ min(abalone$age)
+test_r1 <- (test_all$age) * (max(abalone$age) - 
+                              min(abalone$age)) + 
+  min(abalone$age)
 mse_nn1 <- sum((test_r1 - pr_nn1)^2) / nrow(test_all)
-#79.00748
+#79.00748 or 10.78287
 
 pr_nn2 <- pr.nn2$net.result * (max(age) - min(age))
 + min(age)
@@ -98,12 +97,45 @@ plot(single_nn1) #10.119157 error, 4729 steps
 
 plot(single_nn2) #10.12522 error, 69883 steps
 
+#merge age and pr_nn1 together
+plot_new <- cbind(test_all, pr_nn1) %>%
+  select(age, pr_nn1)
+
+#plot real vs. predicted values
+
 #plot regression line
-plot(test_all$age, pr_nn1, col = "red", 
-     main = "Real vs. Predicted for Single node")
+plot(test_r1, pr_nn1, col = "red", 
+     main = "Real vs. Predicted for Single node") 
+abline(0, 1, lwd = 2)
+
+#r squared
+r2_single1 <- function(test_r1, pr_nn1){
+  cor(test_r1, pr_nn1)^2 #0.5169197
+}
+
+#other below
+
 lm(pr_nn1 ~ test_all$age)
 #intercept: 3.972, slope: 15.571
 abline(3.972, 15.571)
+
+#fit polynomial regression
+fit1a <- lm(pr_nn1 ~ test_all$age)
+fit2a <- lm(pr_nn1~poly(test_all$age, 2, raw = TRUE))
+fit3a <- lm(pr_nn1~poly(test_all$age, 3, raw = TRUE))
+fit4a <- lm(pr_nn1~poly(test_all$age, 4, raw = TRUE))
+fit5a <- lm(pr_nn1~poly(test_all$age, 5, raw = TRUE))
+
+plot(test_all$age, pr_nn1, col = "red", 
+     main = "Real vs. Predicted for Single node")
+
+x_axis1 <- seq(0, 1)
+lines(x_axis1, predict(fit1a, col = 'green'))
+abline(fit1a, col = "blue")
+abline(fit2a, col = "green")
+abline(fit3a, col = "purple")
+abline(fit4a, col = "pink")
+abline(fit5a, col = 'black')
 
 plot(test_all$age, pr_nn2, col = "red", 
      main = "Real vs. Predicted for Single node pt.2")
@@ -170,98 +202,3 @@ plot(test_all$age, pr_nn4, col = "red",
 lm(pr_nn4 ~ test_all$age)
 #intercept: 3.562, slope: 16.950
 abline(3.652, 16.950)
-
-####testing code below (delete later: DO NOT RUN BELOW)
-#factor variables to dummy variables: Type
-table(abalone_mine$Type)
-levels(abalone_mine$Type)
-head(model.matrix(~Type, data = abalone_mine))
-abalone_mine$Type <- relevel(abalone_mine$Type, ref = "I")
-head(model.matrix(~Type, data = abalone_mine))
-abalone_matrix <- model.matrix(~Type+LongestShell+Diameter+Height+
-                                 WholeWeight+ShuckedWeight+
-                                 VisceraWeight+ShellWeight+age, 
-                               data = abalone_mine)
-colnames(abalone_matrix)
-
-col_list <- paste(c(colnames(abalone_matrix[, -
-                                              c(1, 11)])), collapse = "+")
-col_list <- paste(c("age~", col_list), collapse="")
-f <- formula(col_list)
-
-#one hidden node
-library(neuralnet)
-set.seed(1234)
-nmodel1 <- neuralnet(f, data = abalone_matrix, hidden = 1, 
-                    threshold = 0.01, 
-                    learningrate.limit = NULL, 
-                    learningrate.factor = list(minus = 0.5, plus = 1.2),
-                    algorithm = "rprop+")
-
-
-
-# Predict on test data
-pr.nn2 <- neuralnet::compute(nmodel, abalone_matrix)
-
-# Compute mean squared error
-pr.nn_2 <- pr.nn2$net.result * (max(age) - min(age)) 
-+ min(age)
-test.r2 <- (abalone_matrix$age) * (max(abalone_matrix$age) 
-                                   - min(abalone_matrix$age)) + 
-  min(abalone_matrix$age)
-MSE.nn <- sum((test.r - pr.nn_)^2) / nrow(test_)
-
-# Plot the neural network
-plot(nmodel1)
-
-#normalize (min-max 0-1)
-#abalone$age = (abalone$)
-
-
-
-#change factor???
-abalone_mine <- abalone
-#levels(abalone_mine$Type)[1] <- 1 #1
-#levels(abalone_mine$Type)[2] <- 2 #2
-#levels(abalone_mine$Type)[3] <- 3 #3
-testing1 <- LETTERS[1:4]
-testing2 <- c("Female", "Male", "Infant")
-factor1 <- factor(sample(testing2, count(abalone_mine), replace = TRUE))
-abalone_mine <- data.frame(factor1)
-library(qdapTools)
-mtabulate(abalone_mine$factor1)
-
-
-# Normalize the data
-maxs <- apply(abalone[2:8], 2, max) 
-mins <- apply(abalone[2:8], 2, min)
-scaled <- as.data.frame(scale(abalone[2:8], center = mins, 
-                              scale = maxs - mins))
-abalone['age'] <- abalone['Rings'] + 1.5
-age <- abalone['age']
-
-# Split the data into training and testing set
-set.seed(12312001)
-partitions <- scaled %>% initial_split(prop = 0.8)
-partitions2 <- age %>% initial_split(prop = 0.8)
-test_ <- testing(partitions)
-train_ <- training(partitions)
-train_age <- training(partitions2)
-test_age <- testing(partitions2)
-train2 <- cbind(train_, train_age)
-test2 <- cbind(test_, test_age)
-# Build Neural Network
-nn <- neuralnet(age ~ LongestShell + Diameter + 
-                  Height + WholeWeight + ShuckedWeight + VisceraWeight + 
-                  ShellWeight, data = train2, hidden = c(2, 2), 
-                linear.output = TRUE, stepmax = 500000, learningrate = 500)
-write_rds(nn, file = "neural_net_take_1.rds")
-nn1 <- read_rds(file = "neural_net_take_1.rds")
-
-###example below
-set.seed(500)
-library(neuralnet)
-library(MASS)
-data4 <- Boston
-maxs4 <- apply(data4, 2, max)
-mins4 <- apply(data4, 2, min)
