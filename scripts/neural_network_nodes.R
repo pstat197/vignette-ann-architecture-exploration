@@ -1,4 +1,4 @@
-#giselle code (will delete later)
+#giselle code 
 
 library(neuralnet)
 library(tidyverse)
