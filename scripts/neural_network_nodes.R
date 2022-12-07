@@ -59,21 +59,12 @@ nmodel_1 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell +
                       learningrate.limit = NULL, 
                       learningrate.factor = list(minus = 0.5, plus = 1.2),
                       algorithm = "rprop+")
-###sammy example
-nmodel_1b <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
-                         Diameter + Height + WholeWeight + ShuckedWeight + 
-                         VisceraWeight + ShellWeight, data = train_all, 
-                       hidden = 1, linear.output = TRUE, stepmax = 500000, 
-                       learningrate = 500)
+
 write_rds(nmodel_1, file = "models/single_nn_1.rds")
 single_nn1 <- read_rds(file = "models/single_nn_1.rds")
 
-write_rds(nmodel_1b, file = "models/single_nn_2.rds")
-single_nn2 <- read_rds(file = "models/single_nn_2.rds")
-
 #predict on test data
 pr.nn1 <- neuralnet::compute(single_nn1, test_all)
-pr.nn2 <- neuralnet::compute(single_nn2, test_all)
 
 #compute mean square error
 pr_nn1 <- pr.nn1$net.result * (max(abalone$age) - min(abalone$age))
@@ -82,24 +73,15 @@ test_r1 <- (test_all$age) * (max(abalone$age) -
                               min(abalone$age)) + 
   min(abalone$age)
 mse_nn1 <- sum((test_r1 - pr_nn1)^2) / nrow(test_all)
-#79.00748 or 10.78287
-
-pr_nn2 <- pr.nn2$net.result * (max(age) - min(age))
-+ min(age)
-test_r2 <- (test_all$age) * (max(test_all$age) - 
-                               min(test_all$age)) + 
-  min(test_all$age)
-mse_nn2 <- sum((test_r2 - pr_nn2)^2) / nrow(test_all)
-#79.04422
+#10.78287
 
 #plot
 plot(single_nn1) #10.119157 error, 4729 steps
 
-plot(single_nn2) #10.12522 error, 69883 steps
-
 #merge age and pr_nn1 together
-plot_new <- cbind(test_all, pr_nn1) %>%
-  select(age, pr_nn1)
+plot_new <- cbind(test_r1, pr_nn1) %>%
+  as.data.frame()
+colnames(plot_new)[2] <- "pr_nn1"
 
 #plot real vs. predicted values
 
@@ -107,9 +89,13 @@ plot_new <- cbind(test_all, pr_nn1) %>%
 plot(test_r1, pr_nn1, col = "red", 
      main = "Real vs. Predicted for Single node") 
 abline(0, 1, lwd = 2)
+library(car)
+res <- avPlots(lm(pr_nn1 ~ test_r1, data = plot_new))
+fit1 <- lsfit(res$test_r1[,1], res$test_r1[,2])
+fit1$coefficients
 
 #r squared
-r2_single1 <- function(test_r1, pr_nn1){
+r2_single1 <- function(){
   cor(test_r1, pr_nn1)^2 #0.5169197
 }
 
@@ -119,12 +105,7 @@ lm(pr_nn1 ~ test_all$age)
 #intercept: 3.972, slope: 15.571
 abline(3.972, 15.571)
 
-#fit polynomial regression
-fit1a <- lm(pr_nn1 ~ test_all$age)
-fit2a <- lm(pr_nn1~poly(test_all$age, 2, raw = TRUE))
-fit3a <- lm(pr_nn1~poly(test_all$age, 3, raw = TRUE))
-fit4a <- lm(pr_nn1~poly(test_all$age, 4, raw = TRUE))
-fit5a <- lm(pr_nn1~poly(test_all$age, 5, raw = TRUE))
+
 
 plot(test_all$age, pr_nn1, col = "red", 
      main = "Real vs. Predicted for Single node")
@@ -152,43 +133,84 @@ nn_multi1 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell +
                        algorithm = "rprop+",
                       hidden = c(2,2), threshold = 0.01, 
                       stepmax = 500000)
-#sammy example
+
 nn_multi2 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
-                        Diameter + Height + WholeWeight + ShuckedWeight + 
-                        VisceraWeight + ShellWeight, data = train_all,
-                      hidden = c(2,2), linear.output = TRUE, stepmax = 500000, 
-                      learningrate = 500)
+                         Diameter + Height + WholeWeight + ShuckedWeight + 
+                         VisceraWeight + ShellWeight, data = train_all,
+                       algorithm = "rprop+",
+                       hidden = c(5,3), threshold = 0.01, 
+                       stepmax = 500000)
+
+nn_multi3 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                         Diameter + Height + WholeWeight + ShuckedWeight + 
+                         VisceraWeight + ShellWeight, data = train_all,
+                       algorithm = "rprop+",
+                       hidden = c(30, 10), threshold = 0.01, 
+                       stepmax = 500000)
+
+single_nn2 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                         Diameter + Height + WholeWeight + ShuckedWeight + 
+                         VisceraWeight + ShellWeight, data = train_all,
+                       algorithm = "rprop+",
+                       hidden = 5, threshold = 0.01, 
+                       stepmax = 500000)
+single_nn3 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                          Diameter + Height + WholeWeight + ShuckedWeight + 
+                          VisceraWeight + ShellWeight, data = train_all,
+                        algorithm = "rprop+",
+                        hidden = 10, threshold = 0.01, 
+                        stepmax = 500000)
+single_nn4 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
+                          Diameter + Height + WholeWeight + ShuckedWeight + 
+                          VisceraWeight + ShellWeight, data = train_all,
+                        algorithm = "rprop+",
+                        hidden = 100, threshold = 0.01, 
+                        stepmax = 500000)
+
 write_rds(nn_multi1, file = "models/multi_nn_1.rds")
 multi_nn1 <- read_rds(file = "models/multi_nn_1.rds")
 
 write_rds(nn_multi2, file = "models/multi_nn_2.rds")
 multi_nn2 <- read_rds(file = "models/multi_nn_2.rds")
 
+write_rds(single_nn2, file = "models/single_nn_2.rds")
+single_nn2 <- read_rds(file = "models/single_nn_2.rds")
+
+write_rds(single_nn3, file = "models/single_nn_3.rds")
+single_nn3 <- read_rds(file = "models/single_nn_3.rds")
+
 #predict on test data
 pr.nn3 <- neuralnet::compute(multi_nn1, test_all)
-pr.nn4 <- neuralnet::compute(multi_nn2, test_all)
 
 #compute mean square error
-pr_nn3 <- pr.nn3$net.result * (max(age) - min(age))
-+ min(age)
-test_r3 <- (test_all$age) * (max(test_all$age) - 
-                               min(test_all$age)) + 
-  min(test_all$age)
+pr_nn3 <- pr.nn3$net.result * (max(abalone$age) - min(abalone$age))
++ min(abalone$age)
+test_r3 <- (test_all$age) * (max(abalone$age) - 
+                               min(abalone$age)) + 
+  min(abalone$age)
 mse_nn3 <- sum((test_r3 - pr_nn3)^2) / nrow(test_all)
 #79.50398
 
-pr_nn4 <- pr.nn4$net.result * (max(age) - min(age))
-+ min(age)
-test_r4 <- (test_all$age) * (max(test_all$age) - 
-                               min(test_all$age)) + 
-  min(test_all$age)
+
+###new (5,3)
+pr.nn4 <- neuralnet::compute(multi_nn2, test_all)
+
+#compute mean square error
+pr_nn4 <- pr.nn4$net.result * (max(abalone$age) - min(abalone$age))
++ min(abalone$age)
+test_r4 <- (test_all$age) * (max(abalone$age) - 
+                               min(abalone$age)) + 
+  min(abalone$age)
 mse_nn4 <- sum((test_r4 - pr_nn4)^2) / nrow(test_all)
-#79.73448
+#10.14382
+
+
+
+####
 
 #plot
 plot(multi_nn1) #9.031362 error, 12087 steps
-
-plot(multi_nn2) #9.072675 error, 9675 steps
+plot(multi_nn2)
 
 #plot regression line
 plot(test_all$age, pr_nn3, col = "red", 
@@ -196,9 +218,3 @@ plot(test_all$age, pr_nn3, col = "red",
 lm(pr_nn3 ~ test_all$age)
 #intercept: 16.962, slope: 3.561
 abline(lm(pr_nn3 ~ test_all$age))
-
-plot(test_all$age, pr_nn4, col = "red", 
-     main = "Real vs. Predicted for Multi Class pt.2")
-lm(pr_nn4 ~ test_all$age)
-#intercept: 3.562, slope: 16.950
-abline(3.652, 16.950)
