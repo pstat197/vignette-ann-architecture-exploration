@@ -47,31 +47,39 @@ $$
 
 ## Activation Functions
 
-Like we noted earlier, the activation function pre-determines whether each node should be 'activated' or not based on the weighted sum value, which we can define as \$z\$. One of the most popular activation function is the Sigmoid function:
+Like we noted earlier, the activation function pre-determines whether each node should be 'activated' or not based on the weighted sum value. The main goal of the activation function is to take the weighted input from a node and output a value that is then either fed into the next hidden layer or sent as an output. It is used to introduce non-linearity into neural networks.
 
-$$
-S(x) = \frac{1}{1+e^{-x}} = \frac{e^x}{e^x+1}
-$$
+The activation function within a neural network works differently depending on the flow of information within that neural network. This movement of information can be described as either Feedforward or Back Propogation within the context of neural networks (V7 Labs).
 
-This function is non-linear and allows the nodes to take any values between 0 and 1. In the case of multiple output classes, this results in different activation probabilities for each output class, so you are able to select the output class with the highest probability of activation (Towards Data Science).
+#### Feedforward Propogation:
 
-The cost function represents the sum of the error, as in the difference between the predicted value and the real value. The cost function for neural networks is given by:
+When the flow of information in a neural network moves in a forward direction. The input is used for calculations in the hidden layer, and those calculations in the hidden layer are used to calculate the output value. Here, the activation function acts as a "gate" between what goes into the input layer and its output into the next hidden layer (V7 Labs).
 
-$$
-\text{Cost}(h_{\theta}(x),y)=
-$$
+#### Back Propogation:
 
-#### DELETE:  
+When the network's weights and biases are adjusted repeatedly in hopes of minimizing the difference between the real output vector of the neural net and the predicted output vector of the neural net. This difference is called the cost function, and its gradients determine the level of adjustment with respect to the activation function, weight, bias, etc. (V7 Labs).
 
-the cost function is given by:
+#### Common Activation Functions:
 
-$$
-J(\theta)=\frac{1}{m}\sum^m_{i=1}\text{Cost}(h_{\theta}(x^{(i)}), y^{(i)})
-$$
+-   Identity: $\sigma(x)=x$
 
-where $h_{\theta}(x)$ is the hypothesis function, and we want it to satisfy the condition $0 \le h_{\theta}(x) \le 1$, so we will define it as $S(\theta^Tx)$ We can defy (Towards Data Science). To optimize the cost function, we need to minimize $J(\theta)$.
+-   Sigmoid: $\sigma(x)=\frac{1}{1+e^{-x}}$
 
-# Architecture Exploration
+-   Hyperbolic tangent: $\sigma(x)=\frac{e^x - e^{-x}}{e^x+e^{-x}}$
+
+-   Rectified linear unit: $\sigma(x)=\text{max}(0,x)$
+
+## Epochs
+
+An epoch is the interval in which the neural network completes everything. In one epoch, you pass in all of your parameters, calculate the loss according to your metric, and compute the partial derivatives of the loss function, and update the resultant weights on the neural network through backpropagation. An epoch is effectively the number of times the neural network \"sees\" the dataset.
+
+Generally, we do not feed all of the data into the model all at the same time, but rather in \"batches\". The batch size is the number of training examples in one forward pass and resultant backwards pass through the model. The number of epochs is determined by the training and validation error. So long as the error rate continues to drop, we should continue updating our model.
+
+An iteration is the number of steps in a single batch. So if we have 100 total data points in our training set, and 5 batches, we would need 20 iterations to complete one iteration.
+
+## Validation Split
+
+# Architecture Exploration Results
 
 ## Using Artificial Neural Networks for Regression
 
@@ -79,8 +87,16 @@ For our purposes, we thought it best to examine neural network architectures in 
 
 We chose to conduct our exploration using the abalone dataset built into R. The dataset contains data on 4177 abalones with feature variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. Our target variable, and what we are trying to predict, is the age of the abalone. The data is supervised, as this target can be calculated by adding 1.5 to the number of rings.
 
-## (What we did and all the things we changed (incorporate code))
+## Epochs Exploration
 
-# Results and Interpretations
+To explore how the number of epochs in our neural network affected the outcome of the regression task, we build a neural net model and ran it using various numbers of epochs. We set the model to have three hidden layers, a Rectified Linear Unit activation function, and a validation split set to 0.3.
+
+We ran the model with 10, 50, and 100 epochs and compared the results of each run, shown below:
+
+![Neural net with 100 epochs](img/nn_100_epochs_loss_error.png)
+
+# Conclusion
+
+[(Interpretation]
 
 What we can interpret about neural network architecture from the things we did and what we changed.

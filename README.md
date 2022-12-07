@@ -14,7 +14,7 @@ For our PSTAT 197A Final vignette, we wanted to take a deep dive into Artificial
 
 Our example data is the abalone dataset built into R, containing data on 4177 abalones. The dataset include predictor variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. Our response variable, and what we are trying to predict, is the age of the abalone. This response variable can be calculated by adding 1.5 to the number of rings, meaning we are working with a supervised dataset.
 
-Our outcomes of our exploration were as follows (note how changes of each of these affect the outcome of the model):
+From our exploration of the different aspects of neural network architecture ()
 
 Layers:
 
@@ -32,7 +32,6 @@ An explanation of the directory structure of the repository.
 
 ### References:
 
-2 or more references to learn more about your topic.
 
 Code references:
 
