@@ -45,3 +45,6 @@ Our repository is structured as follows:
 In order to use the models we have built in our exploration, you can access the code we used by navigating to our scripts folder. The dataset and training/testing sets can be accessed by running lines 1-52 in the neural_network_nodes.R script, as it was the first script that we created. The rest of the scripts can be run after that.
 
 If you are interested in contributing to the repository, you can do so by following the repository structure we have laid out for our exploration, discussed above.
+
+## Conclusion:
+As the number of nodes increase for single layer ANN and the number of nodes decrease for multiple layer ANN, we see a lower MSE and higher weighted R-squared. We see that as the number approaches to 50 epochs, the more accurate our model becomes. 
