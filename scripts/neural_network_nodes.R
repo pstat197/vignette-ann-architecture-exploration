@@ -65,11 +65,11 @@ nmodel_1b <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell +
                          VisceraWeight + ShellWeight, data = train_all, 
                        hidden = 1, linear.output = TRUE, stepmax = 500000, 
                        learningrate = 500)
-write_rds(nmodel_1, file = "models/single_nn_1.rds")
-single_nn1 <- read_rds(file = "models/single_nn_1.rds")
+write_rds(nmodel_1, file = "../models/single_nn_1.rds")
+single_nn1 <- read_rds(file = "../models/single_nn_1.rds")
 
-write_rds(nmodel_1b, file = "models/single_nn_2.rds")
-single_nn2 <- read_rds(file = "models/single_nn_2.rds")
+write_rds(nmodel_1b, file = "../models/single_nn_2.rds")
+single_nn2 <- read_rds(file = "../models/single_nn_2.rds")
 
 #predict on test data
 pr.nn1 <- neuralnet::compute(single_nn1, test_all)
