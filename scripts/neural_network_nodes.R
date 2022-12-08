@@ -230,7 +230,6 @@ pr.nn5 <- neuralnet::compute(nn_multi2, test_all)
 pr_nn5 <- pr.nn5$net.result * (max(abalone$age) - min(abalone$age))
 + min(abalone$age)
 test_r5 <- (test_all$age) * (max(abalone$age) - 
-                               
                                min(abalone$age)) + min(abalone$age)
 mse_nn5 <- sum((test_r5 - pr_nn5)^2) / nrow(test_all)
 mse_nn5 #10.01608
@@ -290,3 +289,4 @@ fit6$coefficients
 
 #r squared
 r2_single6 <-  cor(res6$test_r6[,1], res6$test_r6[,2])^2 #0.5419721
+

@@ -83,11 +83,79 @@ An iteration is the number of steps in a single batch. So if we have 100 total d
 
 For our purposes, we thought it best to examine neural network architectures in a regression problem. Artificial Neural Networks are used for regression in order to learn the complex, non-linear relationships that are sometimes present between target and features. They are able to do this due to the presence of the activation functions within each layer (Analytics Vidhya). Because we
 
-We chose to conduct our exploration using the abalone dataset built into R. The dataset contains data on 4177 abalones with feature variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. Our target variable, and what we are trying to predict, is the age of the abalone. The data is supervised, as this target can be calculated by adding 1.5 to the number of rings.
+We chose to conduct our exploration using the abalone dataset built into R. The dataset contains data on 4177 abalones with feature variables such as type (male, female, or infant), diameter, height, longest shell measurements, and various weights. Our target variable, and what we are trying to predict, is the age of the abalone. The data is supervised, as this target can be calculated by adding 1.5 to the number of rings.
 
-## Layers Exploration
+## Layers and Nodes Exploration
 
-## Nodes Exploration
+### MSE
+
+To see if having single layers or multiple layers plays a role in improving MSE (mean square error), we decided to have three examples for each single layer ANN and multiple-layer ANN, using a Logistic Regression activation function and setting the algorithm to "rprop+".
+
+For single layer, we set models to 1, 5, 6 hidden nodes for the single layer as shown below:
+
+![](img/single_node_1_nn.png){width="400"}
+
+Single layer with 1 node. MSE: 10.78287
+
+![](img/single_node_5_nn.png){width="400"}
+
+Single layer with 5 nodes. MSE: 10.04245
+
+![](img/single_node_6_nn.png){width="400"}
+
+Single layer with 6 nodes. MSE: 9.991573
+
+As shown above, the MSE has decreased as the number of nodes decrease for single layer ANN. Although, when I tried to run for 8 and 10 nodes, the code would not run, which may indicate that below 6 nodes may be enough.
+
+However, in the case for multiple-layer ANN, we see something different. We set models to 2 by 2, 5 by 3, and 8 by 6 hidden nodes for the multiple layer as shown below:
+
+![](img/multi_node_2_2_nn.png){width="400"}
+
+Multiple layer with 2 by 2 nodes. MSE: 9.967073
+
+![](img/multi_node_5_3_nn.png){width="400"}
+
+Multiple layer with 5 by 3 nodes. MSE: 10.01608
+
+![](img/multi_node_8_6_nn.png){width="400"}
+
+Multiple layer with 8 by 6 nodes. MSE: 10.33044
+
+In this case, with just the 2 nodes per layer, we already see that the MSE is already lower than all previous examples with a single layer. However, once we increase the first and second layer, the MSE increases. This indicates that there is more nodes than needed and may be a sign of over training. This indicates that the best model is where there is more nodes for a single layer or less nodes for a multiple layer for this dataset. In our case, the 2 by 2 multiple layer is our best model as it has the lowest MSE.
+
+### R-squared (measuring predictability of models)
+
+We can also measure if single layer is better than multiple layers in the sense that it could accurately measure the actual values of the abalone age. We plotted a fitted weighted plot for each of the 6 models above that shows the relationship between predicted values (y axis) and actual values (x axis):
+
+![](img/single_node_1_plot.png){width="260"}
+
+Single layer with 1 node. R-squared: 0.5169197
+
+![](img/single_node_5_plot.png){width="260"}
+
+Single layer with 5 nodes. R-squared: 0.5885074
+
+![](img/single_nn_6_plot.png){width="260"}
+
+Single layer with 6 nodes. R-squared: 0.5931386
+
+We see that the R-squared increases as the number of nodes increases. In the plots, we can see the the points are getting closer and closer to the regression line, indicating if we can accurately predict an abalone age given its features, such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. And all weighted R-squared values are all over 0.5, indicating that we have a pretty good correlation between our predicted and actual values of age.
+
+Now on to the multiple layers. We see a different case for the models to 2 by 2, 5 by 3, and 8 by 6 hidden nodes as shown below:
+
+![](img/multi_node_2_2_plot.png){width="360"}
+
+Multiple layer with 2 by 2 nodes. R-squared: 0.5839595
+
+![](img/multi_node_5_3_plot.png){width="360"}
+
+Multiple layer with 5 by 3 nodes. R-squared: 0.5912586
+
+![](img/multi_node_8_6_plot.png){width="360"}
+
+Multiple layer with 8 by 6 nodes. R-squared: 0.5419721
+
+As seen here, as the nodes increase for multiple layer ANN, we see R-square increase, until it reaches too many nodes as shown by the 8 by 6 nodes, where weighted R-square decreased. Overall, we see that our model for single layer of 6 nodes had the best weighted R-squared, meaning its predicted values were very similar to its actual values with a strong correlation of almost 0.6. However, all models had an R-square of over 0.5, indicating that all models did a pretty good job of estimating our real values of abalone age.
 
 ## Epochs Exploration
 
@@ -108,3 +176,5 @@ As you can see in the improvement in MSE from 10 to 50 and 100 epochs, we did se
 [(Interpretation]
 
 What we can interpret about neural network architecture from the things we did and what we changed.
+
+Based on our models, we that as we see that having multiple layer of less nodes has a lower MSE, indicating that overall predicted and actual value difference was pretty small. This means that having multiple layers may accurately depict our actual values of abalone age, however, there is such thing of over training, where the MSE will increase if there is too many nodes. For weighted R-squared, we see that having more nodes for a single layer and less nodes for a multiple layer has a higher weighted R-squared, indicating that predicted ages were very similar to the actual ages of the abalone. All had a weighted R-squared of over 0.5. We also see that as we increase the number of epochs to a certain point, in this case it was 50, the model was more accurate. However, too many epochs such as 100 in our case, may have caused overfitting as the model was not as accurate as the 50 epochs model.
