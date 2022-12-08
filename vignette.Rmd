@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Introduction
 
-Blah blah blah short intro
+This vignette report outlines the process of our exploration of Neural Network Architecture and how it affects the outcome of the model. Below, we will summarize our background research on the different aspects of neural network architecture, the data we decided to conduct our exploration with, how we tested the different aspects of neural netnarchitecture, and our conclusions as to how changes to the architecture affected the outcome of our model fitting.
 
 # Neural Network Architecture Background
 
@@ -49,13 +49,13 @@ $$
 
 Like we noted earlier, the activation function pre-determines whether each node should be 'activated' or not based on the weighted sum value. The main goal of the activation function is to take the weighted input from a node and output a value that is then either fed into the next hidden layer or sent as an output. It is used to introduce non-linearity into neural networks.
 
-The activation function within a neural network works differently depending on the flow of information within that neural network. This movement of information can be described as either Feedforward or Back Propogation within the context of neural networks (V7 Labs).
+The activation function within a neural network works differently depending on the flow of information within that neural network. This movement of information can be described as either Feedforward or Back Propagation within the context of neural networks (V7 Labs).
 
-#### Feedforward Propogation:
+#### Feedforward Propagation:
 
 When the flow of information in a neural network moves in a forward direction. The input is used for calculations in the hidden layer, and those calculations in the hidden layer are used to calculate the output value. Here, the activation function acts as a "gate" between what goes into the input layer and its output into the next hidden layer (V7 Labs).
 
-#### Back Propogation:
+#### Back Propagation:
 
 When the network's weights and biases are adjusted repeatedly in hopes of minimizing the difference between the real output vector of the neural net and the predicted output vector of the neural net. This difference is called the cost function, and its gradients determine the level of adjustment with respect to the activation function, weight, bias, etc. (V7 Labs).
 
@@ -85,6 +85,10 @@ For our purposes, we thought it best to examine neural network architectures in 
 
 We chose to conduct our exploration using the abalone dataset built into R. The dataset contains data on 4177 abalones with feature variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. Our target variable, and what we are trying to predict, is the age of the abalone. The data is supervised, as this target can be calculated by adding 1.5 to the number of rings.
 
+## Layers Exploration
+
+## Nodes Exploration
+
 ## Epochs Exploration
 
 To explore how the number of epochs in our neural network affected the outcome of the regression task, we build a neural net model and ran it using various numbers of epochs. We set the model to have three hidden layers, a Rectified Linear Unit activation function, and a validation split set to 0.3.
@@ -93,11 +97,11 @@ We ran the model with 10, 50, and 100 epochs and compared the results of each ru
 
 ![Neural net with 10 epochs](img/nn_10_epochs_loss_error.png){width="424"}
 
-![Neural net with 50 epochs](img/nn_50_epochs_loss_error.png){width="424"}
+![Neural net with 50 epochs](img/nn_50_epochs_loss_error.png)
 
 ![Neural net with 100 epochs](img/nn_100_epochs_loss_error.png)
 
-As you can see in the improvement in MSE from 10 to 50 and 100 epochs, we did see a better accuracy when adding more epochs to the neural network. However, adding more epochs to the model doesn't always necessary make the model more accurate, as seen in comparing the MSE from 50 to 100 epochs. This was due to the model becoming overfit to the data with too many epochs added. Our optimal outcome was achieved by using 50 epochs to fit our neural network.
+As you can see in the improvement in MSE from 10 to 50 and 100 epochs, we did see a better accuracy when adding more epochs to the neural network. However, adding more epochs to the model doesn't always necessary make the model more accurate, as seen in comparing the MSE from 50 to 100 epochs. This was due to the model overfitting to the data as too many epochs were being added. Our optimal outcome was achieved by using 50 epochs to fit our neural network.
 
 # Conclusion
 
