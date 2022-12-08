@@ -179,6 +179,9 @@ single_nn2 <- read_rds(file = "models/single_nn_2.rds")
 write_rds(single_nn3, file = "models/single_nn_3.rds")
 single_nn3 <- read_rds(file = "models/single_nn_3.rds")
 
+write_rds(single_nn4, file = "models/single_nn_4.rds")
+single_nn4 <- read_rds(file = "models/single_nn_4.rds")
+
 #predict on test data
 pr.nn3 <- neuralnet::compute(multi_nn1, test_all)
 
