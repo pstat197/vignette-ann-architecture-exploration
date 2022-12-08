@@ -136,10 +136,10 @@ r2_single2 <-  cor(res2$test_r2[,1], res2$test_r2[,2])^2 #0.5672913
 nmodel_3 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
                         Diameter + Height + WholeWeight + ShuckedWeight + 
                         VisceraWeight + ShellWeight, data = train_all, 
-                      hidden = 10, threshold = 0.01, 
-                      learningrate.limit = NULL, 
+                      hidden = 15, threshold = 0.01, 
+                      learningrate.limit = NULL, #act.fct = "logistic", 
                       learningrate.factor = list(minus = 0.5, plus = 1.2), 
-                      act.fct = "logistic", algorithm = "rprop+")
+                      algorithm = "rprop+")
 
 write_rds(nmodel_3, file = "models/single_nn_3.rds")
 single_nn3 <- read_rds(file = "models/single_nn_3.rds")
@@ -230,6 +230,7 @@ pr.nn5 <- neuralnet::compute(nn_multi2, test_all)
 pr_nn5 <- pr.nn5$net.result * (max(abalone$age) - min(abalone$age))
 + min(abalone$age)
 test_r5 <- (test_all$age) * (max(abalone$age) - 
+                               
                                min(abalone$age)) + min(abalone$age)
 mse_nn5 <- sum((test_r5 - pr_nn5)^2) / nrow(test_all)
 mse_nn5
@@ -257,7 +258,7 @@ nn_multi3 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell +
                          Diameter + Height + WholeWeight + ShuckedWeight + 
                          VisceraWeight + ShellWeight, data = train_all,
                        algorithm = "rprop+", act.fct = "logistic",
-                       hidden = c(10, 5), threshold = 0.01, 
+                       hidden = c(8, 6), threshold = 0.01, 
                        stepmax = 500000)
 
 write_rds(nn_multi3, file = "models/multi_nn_3.rds")
