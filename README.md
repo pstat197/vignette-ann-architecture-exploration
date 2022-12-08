@@ -40,6 +40,8 @@ Our repository is structured as follows:
 
 ["Regression Analysis Using Artificial Neural Networks" - Analytics Vidhya](https://www.analyticsvidhya.com/blog/2021/08/a-walk-through-of-regression-analysis-using-artificial-neural-networks-in-tensorflow/)
 
+["Neural Networks in R Tutorial" - Learn by Marketing](https://www.learnbymarketing.com/tutorials/neural-networks-in-r-tutorial/)
+
 ### Instructions:
 
 In order to use the models we have built in our exploration, you can access the code we used by navigating to our scripts folder. The dataset and training/testing sets can be accessed by running lines 1-52 in the neural_network_nodes.R script, as it was the first script that we created. The rest of the scripts can be run after that.
