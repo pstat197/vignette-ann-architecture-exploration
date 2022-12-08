@@ -71,9 +71,9 @@ When the network's weights and biases are adjusted repeatedly in hopes of minimi
 
 ## Epochs
 
-An epoch is the interval in which the neural network completes everything. In one epoch, you pass in all of your parameters, calculate the loss according to your metric, and compute the partial derivatives of the loss function, and update the resultant weights on the neural network through backpropagation. An epoch is effectively the number of times the neural network \"sees\" the dataset.
+An epoch is the interval in which the neural network completes everything. In one epoch, you pass in all of your parameters, calculate the loss according to your metric, and compute the partial derivatives of the loss function, and update the resultant weights on the neural network through backpropagation. An epoch is effectively the number of times the neural network "sees" the dataset.
 
-Generally, we do not feed all of the data into the model all at the same time, but rather in \"batches\". The batch size is the number of training examples in one forward pass and resultant backwards pass through the model. The number of epochs is determined by the training and validation error. So long as the error rate continues to drop, we should continue updating our model.
+Generally, we do not feed all of the data into the model all at the same time, but rather in "batches". The batch size is the number of training examples in one forward pass and resultant backwards pass through the model. The number of epochs is determined by the training and validation error. So long as the error rate continues to drop, we should continue updating our model.
 
 An iteration is the number of steps in a single batch. So if we have 100 total data points in our training set, and 5 batches, we would need 20 iterations to complete one iteration.
 
@@ -93,7 +93,13 @@ To explore how the number of epochs in our neural network affected the outcome o
 
 We ran the model with 10, 50, and 100 epochs and compared the results of each run, shown below:
 
+![Neural net with 10 epochs](img/nn_10_epochs_loss_error.png){width="424"}
+
+![Neural net with 50 epochs](img/nn_50_epochs_loss_error.png){width="424"}
+
 ![Neural net with 100 epochs](img/nn_100_epochs_loss_error.png)
+
+As you can see in the improvement in MSE from 10 to 50 and 100 epochs, we did see a better accuracy when adding more epochs to the neural network. However, adding more epochs to the model doesn't always necessary make the model more accurate, as seen in comparing the MSE from 50 to 100 epochs. This was due to the model becoming overfit to the data with too many epochs added. Our optimal outcome was achieved by using 50 epochs to fit our neural network.
 
 # Conclusion
 
