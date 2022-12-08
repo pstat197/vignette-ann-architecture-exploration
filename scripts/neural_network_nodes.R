@@ -74,10 +74,10 @@ test_r1 <- (test_all$age) * (max(abalone$age) -
                               min(abalone$age)) + 
   min(abalone$age)
 mse_nn1 <- sum((test_r1 - pr_nn1)^2) / nrow(test_all)
-#10.8165
+#10.78287
 
 #plot
-plot(single_nn1) #10.12676 error, 3621 steps
+plot(single_nn1) #10.11916 error, 4729 steps
 
 #merge age and pr_nn1 together
 plot_new <- cbind(test_r1, pr_nn1) %>%
@@ -91,7 +91,7 @@ fit1 <- lsfit(res$test_r1[,1], res$test_r1[,2])
 fit1$coefficients
 
 #r squared
-r2_single1 <-  cor(res$test_r1[,1], res$test_r1[,2])^2 #0.5138825
+r2_single1 <-  cor(res$test_r1[,1], res$test_r1[,2])^2 #0.5169197
 
 ###HIDDEN = 5
 nmodel_2 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
@@ -113,10 +113,10 @@ pr_nn2 <- pr.nn2$net.result * (max(abalone$age) - min(abalone$age))
 test_r2 <- (test_all$age) * (max(abalone$age) - 
                                min(abalone$age)) + min(abalone$age)
 mse_nn2 <- sum((test_r2 - pr_nn2)^2) / nrow(test_all)
-#10.3677
+#10.04245
 
 #plot
-plot(single_nn2) #8.834897 error, 12863 steps
+plot(single_nn2) #8.831077 error, 19294 steps
 
 #merge age and pr_nn2 together
 plot_new2 <- cbind(test_r2, pr_nn2) %>%
@@ -130,14 +130,14 @@ fit2 <- lsfit(res2$test_r2[,1], res2$test_r2[,2])
 fit2$coefficients
 
 #r squared
-r2_single2 <-  cor(res2$test_r2[,1], res2$test_r2[,2])^2 #0.5672913
+r2_single2 <-  cor(res2$test_r2[,1], res2$test_r2[,2])^2 #0.5885074
 
-###HIDDEN = 10?
+###HIDDEN = 6
 nmodel_3 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
                         Diameter + Height + WholeWeight + ShuckedWeight + 
                         VisceraWeight + ShellWeight, data = train_all, 
-                      hidden = 15, threshold = 0.01, 
-                      learningrate.limit = NULL, #act.fct = "logistic", 
+                      hidden = 6, threshold = 0.01, 
+                      learningrate.limit = NULL, act.fct = "logistic", 
                       learningrate.factor = list(minus = 0.5, plus = 1.2), 
                       algorithm = "rprop+")
 
@@ -153,10 +153,10 @@ pr_nn3 <- pr.nn3$net.result * (max(abalone$age) - min(abalone$age))
 test_r3 <- (test_all$age) * (max(abalone$age) - 
                                min(abalone$age)) + min(abalone$age)
 mse_nn3 <- sum((test_r3 - pr_nn3)^2) / nrow(test_all)
-#??
+#9.991573
 
 #plot
-plot(single_nn3) #??? error, ??? steps
+plot(single_nn3) #8.805648 error, 18465 steps
 
 #merge age and pr_nn3 together
 plot_new3 <- cbind(test_r3, pr_nn3) %>%
@@ -170,7 +170,7 @@ fit3 <- lsfit(res3$test_r3[,1], res3$test_r3[,2])
 fit3$coefficients
 
 #r squared
-r2_single3 <-  cor(res3$test_r3[,1], res3$test_r3[,2])^2 #0.5672913
+r2_single3 <-  cor(res3$test_r3[,1], res3$test_r3[,2])^2 #0.5931386
 
 #multiple hidden nodes
 set.seed(1234)
@@ -194,10 +194,10 @@ pr_nn4 <- pr.nn4$net.result * (max(abalone$age) - min(abalone$age))
 test_r4 <- (test_all$age) * (max(abalone$age) - 
                                min(abalone$age)) + min(abalone$age)
 mse_nn4 <- sum((test_r4 - pr_nn4)^2) / nrow(test_all)
-#?????
+#9.967073
 
 #plot
-plot(nn_multi1) #???? error, ??? steps
+plot(nn_multi1) #9.031362 error, 12087 steps
 
 #merge age and pr_nn4 together
 plot_new4 <- cbind(test_r4, pr_nn4) %>%
@@ -211,7 +211,7 @@ fit4 <- lsfit(res4$test_r4[,1], res4$test_r4[,2])
 fit4$coefficients
 
 #r squared
-r2_single4 <-  cor(res4$test_r4[,1], res4$test_r4[,2])^2 #????
+r2_single4 <-  cor(res4$test_r4[,1], res4$test_r4[,2])^2 #0.5839595
 
 ###HIDDEN(5,3)
 nn_multi2 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
@@ -233,11 +233,10 @@ test_r5 <- (test_all$age) * (max(abalone$age) -
                                
                                min(abalone$age)) + min(abalone$age)
 mse_nn5 <- sum((test_r5 - pr_nn5)^2) / nrow(test_all)
-mse_nn5
-#?????
+mse_nn5 #10.01608
 
 #plot
-plot(nn_multi2) #???? error, ??? steps
+plot(nn_multi2) #8.635563 error, 27668 steps
 
 #merge age and pr_nn2 together
 plot_new5 <- cbind(test_r5, pr_nn5) %>%
@@ -251,7 +250,7 @@ fit5 <- lsfit(res5$test_r5[,1], res5$test_r5[,2])
 fit5$coefficients
 
 #r squared
-r2_single5 <-  cor(res5$test_r5[,1], res5$test_r5[,2])^2 #????
+r2_single5 <-  cor(res5$test_r5[,1], res5$test_r5[,2])^2 #0.5912586
 
 ###HIDDEN()
 nn_multi3 <- neuralnet(age ~ Type_F + Type_I + Type_M + LongestShell + 
@@ -273,10 +272,10 @@ pr_nn6 <- pr.nn6$net.result * (max(abalone$age) - min(abalone$age))
 test_r6 <- (test_all$age) * (max(abalone$age) - 
                                min(abalone$age)) + min(abalone$age)
 mse_nn6 <- sum((test_r6 - pr_nn6)^2) / nrow(test_all)
-#?????
+#10.33044
 
 #plot
-plot(nn_multi3) #???? error, ??? steps
+plot(nn_multi3) #7.7441922 error, 305104 steps
 
 #merge age and pr_nn2 together
 plot_new6 <- cbind(test_r6, pr_nn6) %>%
@@ -285,54 +284,9 @@ colnames(plot_new6)[2] <- "pr_nn4"
 
 #plot real vs. predicted values
 res6 <- avPlots(lm(pr_nn6 ~ test_r6, data = plot_new6), 
-                main = "Real vs. Predicted for Multi node (??,?)")
+                main = "Real vs. Predicted for Multi node (8,6)")
 fit6 <- lsfit(res6$test_r6[,1], res6$test_r6[,2])
 fit6$coefficients
 
 #r squared
-r2_single6 <-  cor(res6$test_r6[,1], res6$test_r6[,2])^2 #????
-
-
-
-
-###extra:
-
-#predict on test data
-pr.nn3 <- neuralnet::compute(multi_nn1, test_all)
-
-#compute mean square error
-pr_nn3 <- pr.nn3$net.result * (max(abalone$age) - min(abalone$age))
-+ min(abalone$age)
-test_r3 <- (test_all$age) * (max(abalone$age) - 
-                               min(abalone$age)) + 
-  min(abalone$age)
-mse_nn3 <- sum((test_r3 - pr_nn3)^2) / nrow(test_all)
-#79.50398
-
-
-###new (5,3)
-pr.nn4 <- neuralnet::compute(multi_nn2, test_all)
-
-#compute mean square error
-pr_nn4 <- pr.nn4$net.result * (max(abalone$age) - min(abalone$age))
-+ min(abalone$age)
-test_r4 <- (test_all$age) * (max(abalone$age) - 
-                               min(abalone$age)) + 
-  min(abalone$age)
-mse_nn4 <- sum((test_r4 - pr_nn4)^2) / nrow(test_all)
-#10.14382
-
-
-
-####
-
-#plot
-plot(multi_nn1) #9.031362 error, 12087 steps
-plot(multi_nn2)
-
-#plot regression line
-plot(test_all$age, pr_nn3, col = "red", 
-     main = "Real vs. Predicted for Multi Class")
-lm(pr_nn3 ~ test_all$age)
-#intercept: 16.962, slope: 3.561
-abline(lm(pr_nn3 ~ test_all$age))
+r2_single6 <-  cor(res6$test_r6[,1], res6$test_r6[,2])^2 #0.5419721
