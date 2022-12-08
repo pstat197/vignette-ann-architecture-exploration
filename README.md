@@ -14,24 +14,13 @@ For our PSTAT 197A Final vignette, we wanted to take a deep dive into Artificial
 
 Our example data is the abalone dataset built into R, containing data on 4177 abalones. The dataset include predictor variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. Our response variable, and what we are trying to predict, is the age of the abalone. This response variable can be calculated by adding 1.5 to the number of rings, meaning we are working with a supervised dataset.
 
-From our exploration of the different aspects of neural network architecture ()
-
-Layers:
-
-Epochs:
-
-Validation Split:
-
-Activation Function:
-
-Error Metric:
+From our exploration of the different aspects of neural network architecture (layers, nodes, activation functions, and epochs), we concluded that blah blah blah
 
 ### Repository Contents:
 
 An explanation of the directory structure of the repository.
 
 ### References:
-
 
 Code references:
 
