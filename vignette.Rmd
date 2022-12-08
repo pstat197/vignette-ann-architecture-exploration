@@ -77,13 +77,11 @@ Generally, we do not feed all of the data into the model all at the same time, b
 
 An iteration is the number of steps in a single batch. So if we have 100 total data points in our training set, and 5 batches, we would need 20 iterations to complete one iteration.
 
-## Validation Split
-
 # Architecture Exploration Results
 
 ## Using Artificial Neural Networks for Regression
 
-For our purposes, we thought it best to examine neural network architectures in a regression problem. Artificial Neural Networks are used for regression in order to learn the complex, non-linear relationships that are sometimes present between target and features. They are able to do this due to the presence of the activation functions within each layer (Analytics Vidhya).
+For our purposes, we thought it best to examine neural network architectures in a regression problem. Artificial Neural Networks are used for regression in order to learn the complex, non-linear relationships that are sometimes present between target and features. They are able to do this due to the presence of the activation functions within each layer (Analytics Vidhya). Because we
 
 We chose to conduct our exploration using the abalone dataset built into R. The dataset contains data on 4177 abalones with feature variables such as type (male, female, or infant), diameter, height, longest shell measurements, number of rings, and various weights. Our target variable, and what we are trying to predict, is the age of the abalone. The data is supervised, as this target can be calculated by adding 1.5 to the number of rings.
 
