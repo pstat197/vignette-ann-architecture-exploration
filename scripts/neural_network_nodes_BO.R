@@ -68,41 +68,41 @@ nn_bo_wf1 <- workflow() %>%
                 VisceraWeight + ShellWeight)
 
 #Using random search to determine best hyperparameters
-tuned_random1 <- nn_bo_wf1 %>% 
-  tune_grid(resamples = folds, 
-            grid = grid_random(hidden_units(range = c(5L,15L)), epochs(range = c(10L,100L)), size = 10), metrics=metric_set(rmse))
-df_r1 <- tuned_random1 %>% collect_metrics()
+# tuned_random1 <- nn_bo_wf1 %>% 
+#   tune_grid(resamples = folds, 
+#             grid = grid_random(hidden_units(range = c(5L,15L)), epochs(range = c(10L,100L)), size = 10), metrics=metric_set(rmse))
+# df_r1 <- tuned_random1 %>% collect_metrics()
 
-write_csv(df_r1, "data/nn_R1.csv")
+#write_csv(df_r1, "data/nn_R1.csv")
 df_r1 <- read_csv("data/nn_R1.csv")
 df_r1 %>% arrange(mean)
 
 #Using bayesian optimization UCB to determine best hyperparameters
-tuned_UCB1 <- nn_bo_wf1 %>% 
-  tune_bayes(resamples = folds,
-             param_info=parameters(hidden_units(range = c(5L,15L)), 
-             epochs(range = c(10L,100L))),
-             metrics=metric_set(rmse),
-             objective=conf_bound(kappa = 2))
+# tuned_UCB1 <- nn_bo_wf1 %>% 
+#   tune_bayes(resamples = folds,
+#              param_info=parameters(hidden_units(range = c(5L,15L)), 
+#              epochs(range = c(10L,100L))),
+#              metrics=metric_set(rmse),
+#              objective=conf_bound(kappa = 2))
+# 
+# df_UCB1 <- tuned_UCB1 %>% collect_metrics()
 
-df_UCB1 <- tuned_UCB1 %>% collect_metrics()
-
-write_csv(df_UCB1, "models/nn_UCB1.csv")
-df_UCB1 <- read_csv("models/nn_UCB1.csv")
+#write_csv(df_UCB1, "data/nn_UCB1.csv")
+df_UCB1 <- read_csv("data/nn_UCB1.csv")
 df_UCB1 %>% arrange(-mean)
 
 #Using bayesian optimization EI to determine best hyperparameters
-tuned_EI1 <- nn_bo_wf1 %>% 
-  tune_bayes(resamples = folds,
-             param_info=parameters(hidden_units(range = c(5L,15L)), 
-             epochs(range = c(10L,100L))),
-             metrics=metric_set(rmse),
-             objective=exp_improve(trade_off = 0.01))
+# tuned_EI1 <- nn_bo_wf1 %>% 
+#   tune_bayes(resamples = folds,
+#              param_info=parameters(hidden_units(range = c(5L,15L)), 
+#              epochs(range = c(10L,100L))),
+#              metrics=metric_set(rmse),
+#              objective=exp_improve(trade_off = 0.01))
+# 
+# df_EI1 <- tuned_EI1 %>% collect_metrics()
 
-df_EI1 <- tuned_EI1 %>% collect_metrics()
-
-write_csv(df_EI1, "models/nn_EI1.csv")
-df_EI1 <- read_csv("models/nn_EI1.csv")
+#write_csv(df_EI1, "data/nn_EI1.csv")
+df_EI1 <- read_csv("data/nn_EI1.csv")
 df_EI1 %>% arrange(-mean)
 
 #Using bayesian optimization PI to determine best hyperparameters
@@ -115,8 +115,8 @@ tuned_PI1 <- nn_bo_wf1 %>%
 
 df_PI1 <- tuned_PI1 %>% collect_metrics()
 
-write_csv(df_PI1, "models/nn_PI1.csv")
-df_PI1 <- read_csv("models/nn_PI1.csv")
+#write_csv(df_PI1, "data/nn_PI1.csv")
+df_PI1 <- read_csv("data/nn_PI1.csv")
 df_PI1 %>% arrange(-mean)
 
 #Find best parameters
@@ -130,11 +130,12 @@ df_deep <- tibble(names=c("random", "UCB", "PI", "EI"),
                            df_UCB1[df_UCB1$mean==min(df_UCB1$mean),2, drop=TRUE],
                            df_PI1[df_PI1$mean==min(df_PI1$mean),2, drop=TRUE],
                            df_EI1[df_EI1$mean==min(df_EI1$mean),2, drop=TRUE]),
-                  roc_auc=c(max(df_r1$mean), min(df_UCB1$mean),
-                            max(df_PI1$mean),min(df_EI1$mean)),
+                  rmse=c(min(df_r1$mean), min(df_UCB1$mean),
+                            min(df_PI1$mean),min(df_EI1$mean)),
                   std_err=c(df_r1[df_r1$mean==min(df_r1$mean),ncol(df_r1), drop=TRUE],
                             df_UCB1[df_UCB1$mean==min(df_UCB1$mean),ncol(df_UCB1), drop=TRUE],
                             df_PI1[df_PI1$mean==min(df_PI1$mean),ncol(df_PI1), drop=TRUE],
                             df_EI1[df_EI1$mean==min(df_EI1$mean),ncol(df_EI1), drop=TRUE]))
 
+df_deep %>% mutate(mse = rmse^2)
 #credit to https://www.r-bloggers.com/2020/05/bayesian-hyperparameters-optimization/
