@@ -61,21 +61,19 @@ When the network's weights and biases are adjusted repeatedly in hopes of minimi
 
 #### Common Activation Functions:
 
--   Identity: $\sigma(x)=x$
-        - This is the most basic linear function.
+-   Identity: $\sigma(x)=x$ - This is the most basic linear function.
 
 -   Sigmoid: $\sigma(x)=\frac{1}{1+e^{-x}}$
-      - The sigmoid actiavtion function provides the advantage of 
-        not being linear and thus serving as a superior approximator for
-        nonlinear functions, which comprise the majority of functions.
+
+    -   The sigmoid actiavtion function provides the advantage of not being linear and thus serving as a superior approximator for nonlinear functions, which comprise the majority of functions.
 
 -   Hyperbolic tangent: $\sigma(x)=\frac{e^x - e^{-x}}{e^x+e^{-x}}$
-      - Similar to sigmoid, has an advantage in having a steeper
-      gradient, which allows faster learning.
-      
+
+    -   Similar to sigmoid, has an advantage in having a steeper gradient, which allows faster learning.
 
 -   Rectified linear unit: $\sigma(x)=\text{max}(0,x)$
-      - The advantage of this activation function is that it does not            activate all inear units at the same time.
+
+    -   The advantage of this activation function is that it does not activate all inear units at the same time.
 
 ## Epochs
 
@@ -180,9 +178,5 @@ We ran the model with 10, 50, and 100 epochs and compared the results of each ru
 As you can see in the improvement in MSE from 10 to 50 and 100 epochs, we did see a better accuracy when adding more epochs to the neural network. However, adding more epochs to the model doesn't always necessary make the model more accurate, as seen in comparing the MSE from 50 to 100 epochs. This was due to the model overfitting to the data as too many epochs were being added. Our optimal outcome was achieved by using 50 epochs to fit our neural network.
 
 # Conclusion
-
-[(Interpretation]
-
-What we can interpret about neural network architecture from the things we did and what we changed.
 
 Based on our models, we that as we see that having multiple layer of less nodes has a lower MSE, indicating that overall predicted and actual value difference was pretty small. This means that having multiple layers may accurately depict our actual values of abalone age, however, there is such thing of over training, where the MSE will increase if there is too many nodes. For weighted R-squared, we see that having more nodes for a single layer and less nodes for a multiple layer has a higher weighted R-squared, indicating that predicted ages were very similar to the actual ages of the abalone. All had a weighted R-squared of over 0.5. We also see that as we increase the number of epochs to a certain point, in this case it was 50, the model was more accurate. However, too many epochs such as 100 in our case, may have caused overfitting as the model was not as accurate as the 50 epochs model.
