@@ -62,12 +62,20 @@ When the network's weights and biases are adjusted repeatedly in hopes of minimi
 #### Common Activation Functions:
 
 -   Identity: $\sigma(x)=x$
+        - This is the most basic linear function.
 
 -   Sigmoid: $\sigma(x)=\frac{1}{1+e^{-x}}$
+      - The sigmoid actiavtion function provides the advantage of 
+        not being linear and thus serving as a superior approximator for
+        nonlinear functions, which comprise the majority of functions.
 
 -   Hyperbolic tangent: $\sigma(x)=\frac{e^x - e^{-x}}{e^x+e^{-x}}$
+      - Similar to sigmoid, has an advantage in having a steeper
+      gradient, which allows faster learning.
+      
 
 -   Rectified linear unit: $\sigma(x)=\text{max}(0,x)$
+      - The advantage of this activation function is that it does not            activate all inear units at the same time.
 
 ## Epochs
 
