@@ -299,23 +299,17 @@ overflow-y: auto;
 border: 1px solid #ddd;
 border-radius: 4px;
 }
-.tabset-dropdown > .nav-tabs > li.active:before {
-content: "";
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+content: "\e259";
 font-family: 'Glyphicons Halflings';
 display: inline-block;
 padding: 10px;
 border-right: 1px solid #ddd;
 }
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
-content: "";
-border: none;
-}
-.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
-content: "";
+content: "\e258";
 font-family: 'Glyphicons Halflings';
-display: inline-block;
-padding: 10px;
-border-right: 1px solid #ddd;
+border: none;
 }
 .tabset-dropdown > .nav-tabs > li.active {
 display: block;
@@ -455,20 +449,20 @@ bias, etc. (V7 Labs).</p>
 is the most basic linear function.</p></li>
 <li><p>Sigmoid: <span class="math inline">\(\sigma(x)=\frac{1}{1+e^{-x}}\)</span></p>
 <ul>
-<li>The sigmoid actiavtion function provides the advantage of not being
+<li>The sigmoid activation function provides the advantage of not being
 linear and thus serving as a superior approximator for nonlinear
 functions, which comprise the majority of functions.</li>
 </ul></li>
 <li><p>Hyperbolic tangent: <span class="math inline">\(\sigma(x)=\frac{e^x -
 e^{-x}}{e^x+e^{-x}}\)</span></p>
 <ul>
-<li>Similar to sigmoid, has an advantage in having a steeper gradient,
-which allows faster learning.</li>
+<li>Similar to sigmoid, hyperbolic tangent has an advantage in having a
+steeper gradient, which allows faster learning.</li>
 </ul></li>
 <li><p>Rectified linear unit: <span class="math inline">\(\sigma(x)=\text{max}(0,x)\)</span></p>
 <ul>
 <li>The advantage of this activation function is that it does not
-activate all inear units at the same time.</li>
+activate all linear units at the same time.</li>
 </ul></li>
 </ul>
 </div>
@@ -617,12 +611,640 @@ from 50 to 100 epochs. This was due to the model overfitting to the data
 as too many epochs were being added. Our optimal outcome was achieved by
 using 50 epochs to fit our neural network.</p>
 </div>
+<div id="hyperparameter-tuning" class="section level2">
+<h2>Hyperparameter Tuning</h2>
+<p>As shown previously, the choice of hyperparameters like epochs and
+number of nodes are important in producing an accurate model. In fact,
+finding the optimal choice of hyperparameters is called
+<strong>tuning</strong>. There are many ways to do this such as:</p>
+<ul>
+<li><p>Grid Search: In this method, we manually choose a collection of
+values to be used as hyperparameters and choose the best one at the
+end.</p></li>
+<li><p>Random Search: In this method, we instead choose the range of
+values that can be used and the model randomly selects a random
+combination of values to be used as hyperparameters.</p></li>
+<li><p>Bayesian Optimization: In this method, the model first
+arbitrarily chooses an initial random combination of values to be used
+as hyperparameters. However, on every iteration, it chooses the next
+point by deciding between choosing a point with the most uncertainty
+(known as <strong>active learning</strong>) which might unexpectedly
+have great results (known as <strong>exploration</strong>), or going to
+the point where it is expected to have great results (known as
+<strong>exploitation</strong>).</p></li>
+</ul>
+<p>But how does Bayesian Optimization decides which choice to pursue? It
+uses acquisition functions, and decides by maximizing such
+functions.</p>
+<div id="acquisition-functions" class="section level3">
+<h3>Acquisition Functions:</h3>
+<div id="upper-confidence-bound-ucb" class="section level4">
+<h4>Upper Confidence Bound (UCB):</h4>
+<p><span class="math display">\[
+UCB(x)=\mu(x)+\kappa\sigma(x)
+\]</span></p>
+<p>In this acquisition function, exploitation is signified by the mean
+depicted as <em>mu</em>, and the uncertainty is signified as
+<em>sigma</em>, while lambda is the exploration parameter, depicted as
+<em>kappa</em>, and is used to control the ‘preference’ between
+exploration and exploitation. At every iteration, the query points with
+higher UCB dictates where the model will train at.</p>
+</div>
+<div id="probability-of-improvement-pi" class="section level4">
+<h4>Probability of improvement (PI):</h4>
+<p><span class="math display">\[
+PI(x)=\Phi\left(\frac{\mu(x)-f{max}-\varepsilon}{\sigma(x)}\right)
+\]</span></p>
+<p>In this function, the next point will be determined by choosing the
+point with the greatest probability of improvement over the current
+maximum. After assuming that the probability of improvement follows a
+Gaussian distribution, this is determined by the gaussian CDF of the
+mean, f_max, which is the current maximum, sigma, and a parameter
+epsilon. This acquisition function uses the parameter, depicted as
+epsilon, is used to control the ‘preference’ between exploration and
+exploitation, as larger epsilon value causes less emphasis on
+exploration.</p>
+</div>
+<div id="expected-improvement-ei" class="section level4">
+<h4>Expected Improvement (EI):</h4>
+<p><span class="math display">\[
+EI(x) =
+\left(\mu(x)-f_{max}\right)\Phi\left(\frac{\mu(x)-f{max}-\varepsilon}{\sigma(x)}\right)+\sigma(x)\phi\left(\frac{\mu(x)-f{max}-\varepsilon}{\sigma(x)}\right)
+\]</span></p>
+<p>In this function, the next point is determined by choosing the point
+which has the most expected improvement over the current maximum,
+depicted by f_max. Thus, from the function, we can see that the function
+is high when either the difference between the mean and current maximum,
+or when the uncertainty around sigma is great. Like previously, we use
+epsilon to encourage or discourage exploration.</p>
+</div>
+</div>
+<div id="hyperparameter-tuning-exploration" class="section level3">
+<h3>Hyperparameter Tuning Exploration</h3>
+<p>We explored tuning the amount of epochs and hidden layers on a feed
+forward neural network by using Random Search, BO UCB with kappa value
+of 2, BO PI with epsilon value of 0.1, and BO EPI with epsilon value of
+0.1. We set the range of epochs to 10 to 100, and the range of hidden
+layers from 5 to 15, and trained the neural network using the metric
+Root Mean Squared Error (RMSE). At each iteration, we repeat 5 times and
+get the mean RMSE. After training, we collect the results and chose the
+lowest RMSE from each model, squared the RMSE to get the MSE, and saved
+it into a table. Below is each iteration of each optimization
+process:</p>
+<div id="random-search" class="section level4">
+<h4>Random Search:</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="right">hidden_units</th>
+<th align="right">epochs</th>
+<th align="right">mean</th>
+<th align="right">n</th>
+<th align="right">std_err</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">43</td>
+<td align="right">0.0831214</td>
+<td align="right">5</td>
+<td align="right">0.0016960</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">59</td>
+<td align="right">0.0809606</td>
+<td align="right">5</td>
+<td align="right">0.0012307</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">23</td>
+<td align="right">0.0906071</td>
+<td align="right">5</td>
+<td align="right">0.0007811</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">38</td>
+<td align="right">0.0869176</td>
+<td align="right">5</td>
+<td align="right">0.0008013</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="right">35</td>
+<td align="right">0.0863747</td>
+<td align="right">5</td>
+<td align="right">0.0017134</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="right">45</td>
+<td align="right">0.0846201</td>
+<td align="right">5</td>
+<td align="right">0.0018033</td>
+</tr>
+<tr class="odd">
+<td align="right">15</td>
+<td align="right">92</td>
+<td align="right">0.0790058</td>
+<td align="right">5</td>
+<td align="right">0.0013965</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">57</td>
+<td align="right">0.0803454</td>
+<td align="right">5</td>
+<td align="right">0.0011724</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">98</td>
+<td align="right">0.0791969</td>
+<td align="right">5</td>
+<td align="right">0.0013942</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="right">47</td>
+<td align="right">0.0832966</td>
+<td align="right">5</td>
+<td align="right">0.0017303</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="bayesian-optimization-ucb" class="section level4">
+<h4>Bayesian Optimization UCB:</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="right">hidden_units</th>
+<th align="right">epochs</th>
+<th align="right">mean</th>
+<th align="right">n</th>
+<th align="right">std_err</th>
+<th align="right">.iter</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">37</td>
+<td align="right">0.0863623</td>
+<td align="right">5</td>
+<td align="right">0.0019403</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">18</td>
+<td align="right">0.0925174</td>
+<td align="right">5</td>
+<td align="right">0.0008024</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">11</td>
+<td align="right">63</td>
+<td align="right">0.0813885</td>
+<td align="right">5</td>
+<td align="right">0.0011705</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">74</td>
+<td align="right">0.0793384</td>
+<td align="right">5</td>
+<td align="right">0.0012966</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">86</td>
+<td align="right">0.0790740</td>
+<td align="right">5</td>
+<td align="right">0.0012281</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">86</td>
+<td align="right">0.0793190</td>
+<td align="right">5</td>
+<td align="right">0.0013020</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">85</td>
+<td align="right">0.0791894</td>
+<td align="right">5</td>
+<td align="right">0.0010439</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">7</td>
+<td align="right">87</td>
+<td align="right">0.0789455</td>
+<td align="right">5</td>
+<td align="right">0.0014485</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">88</td>
+<td align="right">0.0792208</td>
+<td align="right">5</td>
+<td align="right">0.0013088</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">9</td>
+<td align="right">87</td>
+<td align="right">0.0792659</td>
+<td align="right">5</td>
+<td align="right">0.0014310</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">87</td>
+<td align="right">0.0792149</td>
+<td align="right">5</td>
+<td align="right">0.0013220</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="right">6</td>
+<td align="right">87</td>
+<td align="right">0.0791428</td>
+<td align="right">5</td>
+<td align="right">0.0009838</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="right">87</td>
+<td align="right">0.0790493</td>
+<td align="right">5</td>
+<td align="right">0.0011561</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">87</td>
+<td align="right">0.0800579</td>
+<td align="right">5</td>
+<td align="right">0.0015945</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="right">10</td>
+<td align="right">86</td>
+<td align="right">0.0792154</td>
+<td align="right">5</td>
+<td align="right">0.0014132</td>
+<td align="right">10</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="bayesian-optimization-ei" class="section level4">
+<h4>Bayesian Optimization EI:</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="right">hidden_units</th>
+<th align="right">epochs</th>
+<th align="right">mean</th>
+<th align="right">n</th>
+<th align="right">std_err</th>
+<th align="right">.iter</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">12</td>
+<td align="right">89</td>
+<td align="right">0.0790093</td>
+<td align="right">5</td>
+<td align="right">0.0013059</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">52</td>
+<td align="right">0.0838119</td>
+<td align="right">5</td>
+<td align="right">0.0004597</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="right">44</td>
+<td align="right">0.0834468</td>
+<td align="right">5</td>
+<td align="right">0.0017598</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">17</td>
+<td align="right">0.0930252</td>
+<td align="right">5</td>
+<td align="right">0.0006012</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">68</td>
+<td align="right">0.0807045</td>
+<td align="right">5</td>
+<td align="right">0.0014267</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">81</td>
+<td align="right">0.0796141</td>
+<td align="right">5</td>
+<td align="right">0.0011473</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="right">100</td>
+<td align="right">0.0789580</td>
+<td align="right">5</td>
+<td align="right">0.0013375</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">8</td>
+<td align="right">94</td>
+<td align="right">0.0790221</td>
+<td align="right">5</td>
+<td align="right">0.0011920</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="right">9</td>
+<td align="right">100</td>
+<td align="right">0.0796411</td>
+<td align="right">5</td>
+<td align="right">0.0010328</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">90</td>
+<td align="right">0.0788767</td>
+<td align="right">5</td>
+<td align="right">0.0012354</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="right">93</td>
+<td align="right">0.0790573</td>
+<td align="right">5</td>
+<td align="right">0.0012442</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">100</td>
+<td align="right">0.0788381</td>
+<td align="right">5</td>
+<td align="right">0.0011610</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">88</td>
+<td align="right">0.0789454</td>
+<td align="right">5</td>
+<td align="right">0.0011403</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="right">5</td>
+<td align="right">99</td>
+<td align="right">0.0794245</td>
+<td align="right">5</td>
+<td align="right">0.0012308</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">90</td>
+<td align="right">0.0789704</td>
+<td align="right">5</td>
+<td align="right">0.0012440</td>
+<td align="right">10</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="bayesian-optimization-pi" class="section level4">
+<h4>Bayesian Optimization PI:</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="right">hidden_units</th>
+<th align="right">epochs</th>
+<th align="right">mean</th>
+<th align="right">n</th>
+<th align="right">std_err</th>
+<th align="right">.iter</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">7</td>
+<td align="right">94</td>
+<td align="right">0.0787614</td>
+<td align="right">5</td>
+<td align="right">0.0013256</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
+<td align="right">37</td>
+<td align="right">0.0865416</td>
+<td align="right">5</td>
+<td align="right">0.0010973</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">8</td>
+<td align="right">60</td>
+<td align="right">0.0795017</td>
+<td align="right">5</td>
+<td align="right">0.0010673</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">10</td>
+<td align="right">21</td>
+<td align="right">0.0917779</td>
+<td align="right">5</td>
+<td align="right">0.0016338</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="right">74</td>
+<td align="right">0.0804417</td>
+<td align="right">5</td>
+<td align="right">0.0015300</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="right">13</td>
+<td align="right">67</td>
+<td align="right">0.0802623</td>
+<td align="right">5</td>
+<td align="right">0.0013336</td>
+<td align="right">1</td>
+</tr>
+<tr class="odd">
+<td align="right">6</td>
+<td align="right">62</td>
+<td align="right">0.0803268</td>
+<td align="right">5</td>
+<td align="right">0.0012585</td>
+<td align="right">2</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">51</td>
+<td align="right">0.0822102</td>
+<td align="right">5</td>
+<td align="right">0.0008287</td>
+<td align="right">3</td>
+</tr>
+<tr class="odd">
+<td align="right">5</td>
+<td align="right">60</td>
+<td align="right">0.0806649</td>
+<td align="right">5</td>
+<td align="right">0.0014111</td>
+<td align="right">4</td>
+</tr>
+<tr class="even">
+<td align="right">15</td>
+<td align="right">74</td>
+<td align="right">0.0793794</td>
+<td align="right">5</td>
+<td align="right">0.0012150</td>
+<td align="right">5</td>
+</tr>
+<tr class="odd">
+<td align="right">14</td>
+<td align="right">43</td>
+<td align="right">0.0847175</td>
+<td align="right">5</td>
+<td align="right">0.0015091</td>
+<td align="right">6</td>
+</tr>
+<tr class="even">
+<td align="right">14</td>
+<td align="right">77</td>
+<td align="right">0.0796128</td>
+<td align="right">5</td>
+<td align="right">0.0012371</td>
+<td align="right">7</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="right">61</td>
+<td align="right">0.0800407</td>
+<td align="right">5</td>
+<td align="right">0.0012114</td>
+<td align="right">8</td>
+</tr>
+<tr class="even">
+<td align="right">11</td>
+<td align="right">75</td>
+<td align="right">0.0793043</td>
+<td align="right">5</td>
+<td align="right">0.0011080</td>
+<td align="right">9</td>
+</tr>
+<tr class="odd">
+<td align="right">12</td>
+<td align="right">59</td>
+<td align="right">0.0805054</td>
+<td align="right">5</td>
+<td align="right">0.0011087</td>
+<td align="right">10</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="final-results" class="section level4">
+<h4>Final Results:</h4>
+<table>
+<thead>
+<tr class="header">
+<th align="left">names</th>
+<th align="right">hidden_units</th>
+<th align="right">epochs</th>
+<th align="right">mse</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">random</td>
+<td align="right">15</td>
+<td align="right">92</td>
+<td align="right">0.0062419</td>
+</tr>
+<tr class="even">
+<td align="left">UCB</td>
+<td align="right">7</td>
+<td align="right">87</td>
+<td align="right">0.0062324</td>
+</tr>
+<tr class="odd">
+<td align="left">PI</td>
+<td align="right">7</td>
+<td align="right">94</td>
+<td align="right">0.0062034</td>
+</tr>
+<tr class="even">
+<td align="left">EI</td>
+<td align="right">5</td>
+<td align="right">100</td>
+<td align="right">0.0062154</td>
+</tr>
+</tbody>
+</table>
+<p>As you can see, it shows that Bayesian Optimization is a more
+efficient way of tuning than random search, as it tends to focus on a
+certain point range after each iteration while the random search
+arbitrarily finds random next points. As a result, it wastes less time
+and resources finding the best result.</p>
+<p>Furthermore, by having the above combinations, we can drastically
+reduce MSE. However, this might also be counter-intuitive as having too
+many epochs might cause over fitting and reduce accuracy overall. As a
+result, we should put further investigation into these hyperparameters.
+Nonetheless, this is a powerful way of selecting the best
+hyperparameters for a model.</p>
+<p>For further detail about Bayesian Optimization, please read this
+great article on it: <a href="https://distill.pub/2020/bayesian-optimization/" class="uri">https://distill.pub/2020/bayesian-optimization/</a>.</p>
+</div>
+</div>
+</div>
 </div>
 <div id="conclusion" class="section level1">
 <h1>Conclusion</h1>
-<p>[(Interpretation]</p>
-<p>What we can interpret about neural network architecture from the
-things we did and what we changed.</p>
 <p>Based on our models, we that as we see that having multiple layer of
 less nodes has a lower MSE, indicating that overall predicted and actual
 value difference was pretty small. This means that having multiple

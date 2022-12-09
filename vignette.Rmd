@@ -61,21 +61,19 @@ When the network's weights and biases are adjusted repeatedly in hopes of minimi
 
 #### Common Activation Functions:
 
--   Identity: $\sigma(x)=x$
-        - This is the most basic linear function.
+-   Identity: $\sigma(x)=x$ - This is the most basic linear function.
 
 -   Sigmoid: $\sigma(x)=\frac{1}{1+e^{-x}}$
-      - The sigmoid actiavtion function provides the advantage of 
-        not being linear and thus serving as a superior approximator for
-        nonlinear functions, which comprise the majority of functions.
+
+    -   The sigmoid activation function provides the advantage of not being linear and thus serving as a superior approximator for nonlinear functions, which comprise the majority of functions.
 
 -   Hyperbolic tangent: $\sigma(x)=\frac{e^x - e^{-x}}{e^x+e^{-x}}$
-      - Similar to sigmoid, has an advantage in having a steeper
-      gradient, which allows faster learning.
-      
+
+    -   Similar to sigmoid, hyperbolic tangent has an advantage in having a steeper gradient, which allows faster learning.
 
 -   Rectified linear unit: $\sigma(x)=\text{max}(0,x)$
-      - The advantage of this activation function is that it does not            activate all inear units at the same time.
+
+    -   The advantage of this activation function is that it does not activate all linear units at the same time.
 
 ## Epochs
 
@@ -179,10 +177,93 @@ We ran the model with 10, 50, and 100 epochs and compared the results of each ru
 
 As you can see in the improvement in MSE from 10 to 50 and 100 epochs, we did see a better accuracy when adding more epochs to the neural network. However, adding more epochs to the model doesn't always necessary make the model more accurate, as seen in comparing the MSE from 50 to 100 epochs. This was due to the model overfitting to the data as too many epochs were being added. Our optimal outcome was achieved by using 50 epochs to fit our neural network.
 
+## Hyperparameter Tuning
+
+As shown previously, the choice of hyperparameters like epochs and number of nodes are important in producing an accurate model. In fact, finding the optimal choice of hyperparameters is called **tuning**. There are many ways to do this such as:
+
+-   Grid Search: In this method, we manually choose a collection of values to be used as hyperparameters and choose the best one at the end.
+
+-   Random Search: In this method, we instead choose the range of values that can be used and the model randomly selects a random combination of values to be used as hyperparameters.
+
+-   Bayesian Optimization: In this method, the model first arbitrarily chooses an initial random combination of values to be used as hyperparameters. However, on every iteration, it chooses the next point by deciding between choosing a point with the most uncertainty (known as **active learning**) which might unexpectedly have great results (known as **exploration**), or going to the point where it is expected to have great results (known as **exploitation**).
+
+But how does Bayesian Optimization decides which choice to pursue? It uses acquisition functions, and decides by maximizing such functions.
+
+### Acquisition Functions:
+
+#### Upper Confidence Bound (UCB):
+
+$$
+UCB(x)=\mu(x)+\kappa\sigma(x) 
+$$
+
+In this acquisition function, exploitation is signified by the mean depicted as *mu*, and the uncertainty is signified as *sigma*, while lambda is the exploration parameter, depicted as *kappa*, and is used to control the 'preference' between exploration and exploitation. At every iteration, the query points with higher UCB dictates where the model will train at.
+
+#### Probability of improvement (PI):
+
+$$
+PI(x)=\Phi\left(\frac{\mu(x)-f{max}-\varepsilon}{\sigma(x)}\right)
+$$
+
+In this function, the next point will be determined by choosing the point with the greatest probability of improvement over the current maximum. After assuming that the probability of improvement follows a Gaussian distribution, this is determined by the gaussian CDF of the mean, f_max, which is the current maximum, sigma, and a parameter epsilon. This acquisition function uses the parameter, depicted as epsilon, is used to control the 'preference' between exploration and exploitation, as larger epsilon value causes less emphasis on exploration.
+
+#### Expected Improvement (EI):
+
+$$
+EI(x) = \left(\mu(x)-f_{max}\right)\Phi\left(\frac{\mu(x)-f{max}-\varepsilon}{\sigma(x)}\right)+\sigma(x)\phi\left(\frac{\mu(x)-f{max}-\varepsilon}{\sigma(x)}\right)
+$$
+
+In this function, the next point is determined by choosing the point which has the most expected improvement over the current maximum, depicted by f_max. Thus, from the function, we can see that the function is high when either the difference between the mean and current maximum, or when the uncertainty around sigma is great. Like previously, we use epsilon to encourage or discourage exploration.
+
+### Hyperparameter Tuning Exploration
+
+We explored tuning the amount of epochs and hidden layers on a feed forward neural network by using Random Search, BO UCB with kappa value of 2, BO PI with epsilon value of 0.1, and BO EPI with epsilon value of 0.1. We set the range of epochs to 10 to 100, and the range of hidden layers from 5 to 15, and trained the neural network using the metric Root Mean Squared Error (RMSE). At each iteration, we repeat 5 times and get the mean RMSE. After training, we collect the results and chose the lowest RMSE from each model, squared the RMSE to get the MSE, and saved it into a table. Below is each iteration of each optimization process:
+
+```{r, echo=FALSE, include=FALSE}
+library(tidyverse)
+df_deep <- read_csv('data/nn_final_deep.csv')[c(1,2,3,6)]
+df_r1 <- read_csv("data/nn_R1.csv")
+df_UCB1 <- read_csv("data/nn_UCB1.csv")
+df_EI1 <- read_csv("data/nn_EI1.csv")
+df_PI1 <- read_csv("data/nn_PI1.csv")
+```
+
+#### Random Search:
+
+```{r, echo=FALSE}
+knitr::kable(df_r1 %>% select(-.metric, -.estimator, -.config), 'simple')
+```
+
+#### Bayesian Optimization UCB:
+
+```{r, echo=FALSE}
+knitr::kable(df_UCB1 %>% select(-.metric, -.estimator, -.config), 'simple')
+```
+
+#### Bayesian Optimization EI:
+
+```{r, echo=FALSE}
+knitr::kable(df_EI1 %>% select(-.metric, -.estimator, -.config), 'simple')
+```
+
+#### Bayesian Optimization PI:
+
+```{r, echo=FALSE}
+knitr::kable(df_PI1 %>% select(-.metric, -.estimator, -.config), 'simple')
+```
+
+#### Final Results:
+
+```{r, echo=FALSE}
+knitr::kable(df_deep, 'simple')
+```
+
+As you can see, it shows that Bayesian Optimization is a more efficient way of tuning than random search, as it tends to focus on a certain point range after each iteration while the random search arbitrarily finds random next points. As a result, it wastes less time and resources finding the best result.
+
+Furthermore, by having the above combinations, we can drastically reduce MSE. However, this might also be counter-intuitive as having too many epochs might cause over fitting and reduce accuracy overall. As a result, we should put further investigation into these hyperparameters. Nonetheless, this is a powerful way of selecting the best hyperparameters for a model.
+
+For further detail about Bayesian Optimization, please read this great article on it: <https://distill.pub/2020/bayesian-optimization/>.
+
 # Conclusion
-
-[(Interpretation]
-
-What we can interpret about neural network architecture from the things we did and what we changed.
 
 Based on our models, we that as we see that having multiple layer of less nodes has a lower MSE, indicating that overall predicted and actual value difference was pretty small. This means that having multiple layers may accurately depict our actual values of abalone age, however, there is such thing of over training, where the MSE will increase if there is too many nodes. For weighted R-squared, we see that having more nodes for a single layer and less nodes for a multiple layer has a higher weighted R-squared, indicating that predicted ages were very similar to the actual ages of the abalone. All had a weighted R-squared of over 0.5. We also see that as we increase the number of epochs to a certain point, in this case it was 50, the model was more accurate. However, too many epochs such as 100 in our case, may have caused overfitting as the model was not as accurate as the 50 epochs model.

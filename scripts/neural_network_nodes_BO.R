@@ -3,9 +3,6 @@ library(neuralnet)
 library(tidyverse)
 library(tidymodels)
 library(AppliedPredictiveModeling)
-library(cobalt)
-library(readr)
-library(themis)
 
 # abalone dataset
 data(abalone)
@@ -54,13 +51,17 @@ train_all <- training(partitions_all)
 
 #Bayesian Optimization
 
-set.seed(1234)
+set.seed(1234) #for reproducibility
+
+#set folds to cross-validate
 folds <- vfold_cv(train_all, v=5, strata = age) 
 
+#create keras regression model and set hidden_units and epochs for tuning
 model_tune1 <- mlp(hidden_units = tune(), epochs = tune()) %>% 
   set_engine("keras") %>% 
   set_mode("regression")
 
+#create workflow, and add model
 nn_bo_wf1 <- workflow() %>%
   add_model(model_tune1) %>%
   add_formula(age ~ Type_F + Type_I + Type_M + LongestShell + 
@@ -106,14 +107,14 @@ df_EI1 <- read_csv("data/nn_EI1.csv")
 df_EI1 %>% arrange(-mean)
 
 #Using bayesian optimization PI to determine best hyperparameters
-tuned_PI1 <- nn_bo_wf1 %>% 
-  tune_bayes(resamples = folds,
-             param_info=parameters(hidden_units(range = c(5L,15L)), 
-                                   epochs(range = c(10L,100L))),
-             metrics=metric_set(rmse),
-             objective=prob_improve(trade_off = 0.01))
-
-df_PI1 <- tuned_PI1 %>% collect_metrics()
+# tuned_PI1 <- nn_bo_wf1 %>% 
+#   tune_bayes(resamples = folds,
+#              param_info=parameters(hidden_units(range = c(5L,15L)), 
+#                                    epochs(range = c(10L,100L))),
+#              metrics=metric_set(rmse),
+#              objective=prob_improve(trade_off = 0.01))
+# 
+# df_PI1 <- tuned_PI1 %>% collect_metrics()
 
 #write_csv(df_PI1, "data/nn_PI1.csv")
 df_PI1 <- read_csv("data/nn_PI1.csv")
@@ -137,5 +138,8 @@ df_deep <- tibble(names=c("random", "UCB", "PI", "EI"),
                             df_PI1[df_PI1$mean==min(df_PI1$mean),ncol(df_PI1), drop=TRUE],
                             df_EI1[df_EI1$mean==min(df_EI1$mean),ncol(df_EI1), drop=TRUE]))
 
-df_deep %>% mutate(mse = rmse^2)
+#add MSE by RMSE^2
+df_deep <- df_deep %>% mutate(mse = rmse^2)
+
+#write_csv(df_deep, 'data/nn_final_deep.csv')
 #credit to https://www.r-bloggers.com/2020/05/bayesian-hyperparameters-optimization/
